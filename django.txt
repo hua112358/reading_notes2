@@ -1,0 +1,314 @@
+1   安装
+    virtualenv v1
+    source v1/bin/activate
+    pip install django==1.8.2
+    pip list
+2   创建项目
+        mkdir projects
+        cd projects
+        source ~/v1/bin/activate
+        django-admin startproject test_project
+        
+3   mvc 
+        m:代表module，用于和数据库交互
+        v:代表view，用于向用户展示
+        c:代表controller，用于处理用户请求，调用m和v
+
+4   mtv
+        m:代表module，用于和数据库交互
+        t:代表templates，用于向用户展示
+        v:代表view，用于处理用户请求，调用m和t
+       
+5   数据库配置
+        在setting.py中指定数据库
+
+6   创建应用
+        进入项目：cd ~/PycharmProjects/django/test_project
+        进入虚拟环境：source ~/virtualenv/v1/bin/activate
+        创建应用：python manage.py startapp booktest
+       
+7   启动项目
+        在settings中找到installed apps，添加应用bookset
+        模型类迁移(将bookset中models.py创建的类转化为sql语句)：
+            生成迁移：
+                python manage.py makemigrations
+            执行迁移：
+                python manage.py migrate 
+        启动项目：
+            python manage.py runserver 127.0.0.1 8080
+
+8   进入shell
+        python manage.py shell
+        from bookset.models import *
+        # 在BookInfo表中创建一条记录{btitle:"abc", bpub_date:"1999-01-12"}
+        b = BookInfo()
+        b.btile = "abc"
+        b.bpub_date = datetime(year=1999, month=1, day=12)
+        # 保存
+        b.save()
+        # 删除
+        b.delete()
+        # 查询
+        b = BookInfo.objects.get(pk=1)
+        print(b.btitle)
+        print(b.bpub_date)
+        # 改
+        b.btitle = "123"
+        b.save()
+        # 查所有
+        BookInfo.objects.all()
+
+9   后台管理
+        python manage.py createsuperuser
+        python manage.py runserver
+        在settings中可以修改页面设置，如设置中文。
+        # 在应用booktest中的admin中注册模型类
+        from django.contrib import admin
+        from .models import *
+        admin.site.register(BookInfo, BookInfoAdmin)
+        admin.site.register(HeroInfo, HeroInfoAdmin)
+        # 设置页面显示字段
+        class BookInfoAdmin(models.Admin):
+            list_display = ["id", "btitle", "bpub_date]
+        
+10  思路
+        # 创建项目
+        django-amdin startproject test_project
+        # 创建应用
+        python manage.py startapp booktest  
+        # 在booktest的models中定义数据库表
+        from django.db import models
+        class BookInfo(models.Model):
+            btitle = models.CharField(max_length=20)
+            bpub_date = models.DateFiled()
+        # 生成数据库迁移
+        python manage.py makemigrations
+        # 执行数据库迁移
+        python manage.py migrate
+        # 在booktest的admin中注册数据库
+        from .models import *
+        from django.contrib import admin
+        admin.site.register(BookInfo, BookInfoAdmin)
+        # 创建管理员
+        python manage.py createsuperuser
+        # 运行服务器
+        python manage.py runserver 8080
+        # 管理员登录
+        127.0.0.1:8080/admin
+
+11  views
+        views用于接收请求，返回响应
+        from django.shortcuts import render
+        def index(request):
+            
+            return render(request, "booktest/index.html")
+
+12  templates
+        templates即html页面，每个应用有自己的templates目录。/test_project/templates/booktest/index.html
+        修改settings中templates的dirs为[os.path.join(BASE_DIR, "templates")]  
+        
+13  html
+        html中插入python代码
+        <h1>{{title}}</h1>
+        <ul>
+        {%for book in book_list%}
+        <li>{{book.btitle}}<h1>{{title}}</h1>
+        <ul>
+            {%for book in book_list%}
+                <li><a href="{{book.id}}">{{book.btitle}}</a></li>
+                    {%endfor%}
+                    </ul></li>
+        {%endfor%}
+
+14  orm
+        o:object
+        r:relation
+        m:map
+        orm:对象关系映射，将类对象映射为数据库sql语句。
+        
+15  pymysql
+        # 进入虚拟环境
+        source ~/virtualenvs/v1/bin/activate
+        # 安装pymysql
+        pip3 install PyMySql
+        # 创建数据库(django中只能创建表)
+        mysql -uroot -ppasswd
+        create database database2
+        # 创建项目
+        cd ~/PycharmProjects
+        django-admin startproject project1
+        # 修改settings中的database
+        # 修改__init__.py,mysqldb或mysql-python不用修改
+        import pymysql
+        pymysql.install_as_MySQLdb()
+        # 创建应用
+        python manage.py startapp booktest
+        
+14   字段
+        关系：bookinfo.heroinfo_set(一对多), heroinfo.bookinfo(一对一), heroinfo.book_id 
+       
+15  自定义管理器
+        在models中：
+        class BookInfoManager(models.Manager):
+            
+            def get_queryset(self):
+                super(BookInfoManager, self).get_queryset().filter(isDelete=False)
+        class BookInfo(models.Model):
+            books1 = models.Manager()
+            books2 = BookInfoManager()
+        在python manage.py shell交互式环境中:
+            from booktest.models import BookInfo
+            BookInfo.books1.all()
+            BookInfo.books2.all()
+
+16  数据记录的创建方法定义
+        方法一：在模型类中定义
+        class BookInfo(models.Model):
+            @classmethod
+            def create(cls, btitle,bpub_date, bread=0, bcomment=0, isDelete=0):
+                b = BookInfo()
+                b.btitle = btitle
+                b.bpub_date = bpub_date
+                b.bread = bread
+                b.bcomment = bcomment
+                b.isDelete = isDelete
+        方法二：在模型管理器中定义
+        class BookInfoManager(models.Manager):
+            def create(self, btitle,bpub_date, bread=0, bcomment=0, isDelete=0):
+                b = BookInfo()
+                b.btitle = btitle
+                b.bpub_date = bpub_date
+                b.bread = bread
+                b.bcomment = bcomment
+                b.isDelete = isDelete
+             
+17  查询
+        python manage.py shell
+        from booktest.models import BookInfo
+        # 查询参数中没有等号，则字段用字符串表示；有等号，则字段不用字符串表示。
+        BookInfo.books2.all()       
+        BookInfo.books2.exclude(pk=1)       
+        BookInfo.books2.order_by("btitle")       
+        BookInfo.books2.order_by("pk")       
+        BookInfo.books2.values(btitle="天龙八部")       
+        BookInfo.books2.filter(pk=1) 
+        BookInfo.books2.get()
+        BookInfo.books2.count()
+        BookInfo.books2.first()
+        BookInfo.books2.last()
+        BookInfo.books2.exist()
+
+18  缓存
+        # 一次缓存
+        querylist = BookInfo.books2.all()
+        print([e for e in querylist[0:10]])
+        print([e for e in querylist[10:20]])
+
+        # 两次缓存，增加服务器的负载
+        print([e for e in BookInfo.books2.all()])
+        print([e for e in BookInfo.books2.all()])
+
+19  字段查询
+        BookInfo.books2.exclude(btitle__contains="雕")
+        BookInfo.books2.exclude(btitle__startswith="天")
+        BookInfo.books2.exclude(btitle__endswith="天")
+        BookInfo.books2.exclude(btitle__isnull=True)
+        BookInfo.books2.exclude(btitle__isnotnull=False)
+        BookInfo.books2.exclude(btitle__startswith="天")
+        BookInfo.books2.exclude(btitle__in=["天龙八部","神雕侠侣"])
+        BookInfo.books2.filter(id__gt=3).values()
+        BookInfo.books2.filter(id__lt=3).values()
+        BookInfo.books2.filter(id__gte=3).values()
+        BookInfo.books2.filter(id__lte=3).values()
+
+20  F对象
+        F对象用于比较两个字段
+        from django.db.models import F,Q
+        BookInfo.books1.filter(id__gt=F("bread"))
+
+21  Q对象
+        Q对象用于表示逻辑运算
+        from django.db.models import F, Q
+        BookInfo.books1.filter(Q(id__gt=3) | Q(bread__lt=5))
+        BookInfo.books1.filter(~Q(id__gt=3))
+
+22  templates创建404.html，将settings中debug设置为false，allowed_host设置为["*"]
+
+23  get与post
+        get
+            提交方式：在url中提交，127.0.0.1:8000/booktest/getTest1/?name=huashaojie&password=password
+            解析方式：
+                一键一值：request.GET["name"]或request.GET.get("name")
+                一键多值：request.GET.getlist("hobby")
+        post
+            提交方式：在表单form中提交，<input type="text" name="username">,键为username，值为用户提交的值
+            解析方式：
+                一键一值：request.POST["username"]或request.POST.get("username")
+                一键多值：request.POST.getlist("hobby")
+
+24  django中构建response的两种方式
+        方式一
+            from django.shortcuts import render
+            def index(request):
+                name = request.GET["name"]
+                context = {"name": name}
+                return render(request, "booktest/index.html", context)
+        方式二
+            from django.http import HttpResponse
+            from django.template import RequestContext, loader
+            def index(request):
+                name = request.GET["name"]
+                context = RequestContext(request, {"name": name})
+                t = loader.get_template("booktest/index.html")
+                return HttpResponse(t.render(context))
+
+25  状态保持
+        session或cookie
+        
+26  templates
+        DTL:django template language
+        加载模板
+            from django.templates import loader
+            t = loader.get_template("booktest/index.html")
+        渲染模板 
+            t.render(RequestContext)
+        加载渲染
+            from django.shortcuts import render
+            render(request, "booktest/index.html", context)
+
+27  DTL
+        variable: {{variable}}
+        code:{% code %}
+        filter:
+        notes:{# code or html #}
+       
+28  静态文件
+
+29  上传文件
+   
+30  admin站点
+        python manage.py createsuperuser
+        
+31  分页
+        Paginator
+        
+32  jQuery下拉菜单(select)查找省市区
+ 
+       
+       
+       
+       
+       
+       
+       
+       
+       
+       
+       
+       
+       
+       
+       
+       
+       
+        

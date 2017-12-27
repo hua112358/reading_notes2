@@ -1,0 +1,51 @@
+1 使用一个未定义的变量或函数时，将光标移动到该变量或函数上，alt+enter键提示自动创建变量或函数。
+
+2 鼠标移动函数、类、模块、变量上，按住ctrl，点击查看详细信息
+
+3 设置
+	pycharm新建程序自动补全编码和环境：【File】-->【Settings】-->【Editor】-->【Code Style】
+	pycharm设置：file->setting->appearance&behavior->appearance。
+	编辑窗口设置：setting->Editor->colors&fonts
+
+4 pycharm远程调试
+	file》settings》Project Interpreter》
+	pycharm支持四种远程调试：vagrant、deployment、ssh、docker
+	deployment和ssh首先要在Ubuntu启动ssh服务。sudo service start ssh
+
+5 pycharm设置远程调试后，自带的python解释器会变成远程的解释器
+  需要在settings中改回本地python解释器，否则运行程序会报错：
+  Error running: data.username must not be null
+
+6 创建新项目时，可以指定python解释器和搜索路径。可以勾选global packages，将系统中所有python包都添加到搜索路径。不勾选则新项目只有基本的python包。可在file>settings>interpretor中添加路径。
+  ubuntu中python安装包在/usr/local/lib/python3.5/dist-packages目录下，因此只要添加这个路径即可。
+  
+7 virtualenv
+    导入virtualenv:先在交互式环境下创建好虚拟环境，再在pycharm中add local
+    直接创建：在pycharm中create virtualenv，inherite global site-packages
+        导入所有安装包。
+
+8 pycharm安装
+     sudo add-apt-repository ppa:mystic-mirage/pycharm
+     sudo apt update
+     sudo apt install pycharm # 专业版
+     sudo apt install pycharm-community # 社区版
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,491 @@
+0   设置编码
+        查看编码：
+            \s
+            status;
+            show variables like "char%";
+            show create database1;
+        创建数据库时设置：create database database1 charset = utf8;
+        修改当前窗口编码：set character_set_database=gbk;
+        　　              set character_set_server=gbk;
+        修改全局编码：set global character_set_database=utf8;
+                      set global character_set_server=gbk;
+        设置永久编码(修改配置文件):
+            vim /etc/mysql/my.cnf
+            加入：
+                [mysqld]
+                charset-server-database=utf8
+                [client]
+                default-character-set=utf8
+                [mysql]
+                default-character-set=utf8
+            重启服务器：sudo service mysql restart
+
+1   数据库类型
+        文档型：如sqlite，就是一个文件
+        服务型：如mysql，通过tcp/ip协议操作数据库，分为客户端和服务端
+
+2   E-R模型
+        E表示entity，实体(表)；R表示relation，关系(表间关系)
+
+3   三范式
+        范式即关系型数据库设计的原则、规范
+        第一范式：列不可拆分
+        第二范式：对象有唯一标识
+        第三范式：引用主键，对象中每一列数据都与主键直接相关，都是主键
+                  的直接属性。
+
+4   数据库完整性
+        数据库完整性即数据是正确的、符合要求的
+        通过给数据添加限制，可以保证数据库的完整性
+        限制：
+            类型：如int
+            约束：如主键约束、非空约束
+
+5   图形界面操作
+        使用navicat进行图形界面操作
+        使用前要以管理员身份打开cmd，输入命令：net start mysql57，与
+        mysql数据库服务器建立连接。
+
+6   逻辑删除    
+        删除数据要慎重，物理删除后数据难以恢复。
+        逻辑删除：新建一个bit字段isDelete，默认值设为0,要删除一条记录，
+            就将isDelete字段设为1。
+
+7   ubuntu安装mysql
+        安装mysql服务器：sudo apt-get install mysql-server
+        安装mysql客户端：sudo apt-get install mysql-client
+        设置远程访问：
+            修改配置文件：sudo vi /etc/mysql/mysql.conf.d/mysqld.cnf
+                          注释掉：bind-address = 127.0.0.1
+            进入mysql客户端：mysql -uroot -phuapassword
+            授权远程访问：grant all on *.* to root@'%' identified by 'huapassword' with grant option;
+                          flush privileges;
+        启动mysql服务器：service mysql start
+        停止mysql服务器：service mysql stop
+        重启mysql服务器：service mysql restart
+        连接远程mysql服务器：mysql -h远程ip -uroot -p
+
+8   数据库操作
+        增：create database database1 charset=utf8;
+        删：drop database database1;
+        查所有数据库：show databases;
+        切换：use database1;
+        查当前数据库：select database();
+
+9   表操作
+        增：create table students(
+                id int auto_increment primary key,
+                name varchar(10) not null default name1   
+            );
+        删：drop table students;
+        改：alter table students add|change|drop 列名 类型;
+            alter table students add gender bit default 0;
+        查所有表：show tables;
+        查单个表：desc students;
+        改表名：rename table students to new_students
+        查看如何创建：show create table students;
+
+10  数据操作
+        查：select * from students;
+        增：
+            全列插入：insert into students values(0,"name1")
+            缺省插入：insert into students(name) values("name2")
+            插入多条：insert into students(name) values("name1"),("name2")
+        改：update students set name="name3" where id=1;
+        删：
+            物理删除：delete from students where id=1;
+            逻辑删除：update students set isDelete=1 where id=1;
+                      select * from students where isDelete=0;
+
+11  数据备份与恢复
+        备份：
+            获取root权限：sudo -s
+            备份：cd /var/lib/mysql
+                  mysqldump -uroot -p database1 > ~/Desktop/database1.sql
+        恢复：
+            创建一个新表：create database database2
+            退出mysql：quit
+            恢复：mysql -uroot -p database2 < ~/Desktop/database1.sql
+
+12  数据操作
+        查询：
+            查全部：select * from students;
+            查部分：select name,birthday from students;
+            去重：select distinct gender from students;
+            模糊查询：_表示任一字符，%表示任意多个字符
+                      select * from students where name like "华%";
+            范围查询：select * from students where id in (1,3,5,7,9);
+                      select * from students where id between 1 and 10;
+            判断空：select * from students where gender is null;
+            聚合查询：select count(*) from students;
+                      select max(id) from students;
+                      select min(id) from students;
+                      select avg(id) from students;
+                      select sum(id) from students;
+            子查询：select * from students where 
+                    id = (select max(id) from students);
+            分组查询：select gender as 性别,count(*) from students group 
+                      by gender;
+                      分组常与聚合结合使用。非聚合字段不能出现在结果中。
+            分组后筛选：select gender,count(*) from students group by
+                        gender having count(*)>10 or gender = 0;
+                        having是对分组后的数据进行筛选，where是对
+                        from后的数据进行筛选。
+            排序：select * from students order by age asc|desc,name asc|desc
+            获取部分行：select * from students limit 11,10;
+                        从索引11开始查询10条记录，索引从0开始。
+                        select * from students where isDelete = 0
+                        limit (n-1)*m,m;
+            完整的select语句：select distinct 
+                              gender,count(*) as c from students 
+                              where isDelete = 0
+                              group by gender having gender = 0
+                              order by c 
+                              limit 1,3;
+
+13  高级
+        关系、视图、事务、索引
+
+14  关系
+        A，B一对一：关系字段存储在A或B
+        A一对多B：关系字段存储在B中
+        A多对多B：关系字段用新表C表示
+    
+15  外键约束
+        保证关系字段的正确，比如班级表只有班级1,2,3,要保证学生表中
+        学生记录中的班级字段不出现1,2,3以外的数字，就要对班级字段
+        添加外键约束。      
+        create table scores(
+        id int auto_increment primary key not null,
+        stuid int,
+        subid int,
+        foreign key(stuid) references students(id),
+        foreign key(subid) references subjects(id)
+        );
+
+16  级联操作
+        删除一个表中外键所引用的表中记录时，会引发级联操作
+        类型：
+            restrict(限制)，弹出异常
+            cascade(级联)，删除引用该记录的记录
+            set null，将该记录外键设置为空
+            no action，什么也不做
+        一般有被其他表外键引用时，不做物理删除，而做逻辑删除
+
+17  连接查询
+        分类：内连(inner join)，左连(left join)，右连(right join)
+        inner join:两个表中都存在才显示
+            select students.name,subjects.name,scores.score
+            from scores
+            inner join students on scores.stuid = students.id
+            inner join subjects on scores.subid = subjects.id;
+        left join:左表全显示，右表不存在的用null表示
+        right join:右表全显示，左表不存在的用null表示
+
+        select subjects.name,avg(scores.score)
+        from scores
+        inner join subject.id = scores.subid
+        group by subjects.name
+
+18  自关联
+        为了减少创建新表的开销，在数据量较小的时候，可以将类型相似的记录创建在同一张表中，
+        如省、市、县，市对省的引用即为自关联
+        create table area(
+        id int auto_increment primary key not null,
+        title varchar(10) not null,
+        pid int,
+        foreign key(pid) references area(id)
+        );
+        对于省，pid为null，对于市，pid为对应省的id。
+
+        查询山西省所有市
+        select city.* from areas as city
+        inner join areas as province on city.pid = province.id
+        where province.name = "山西省";
+
+        查询太原市所有县
+        select county.* from areas as county
+        inner join areas as city on county.pid = city.id
+        where city.name = "太原市";
+
+19  导入表
+        source table1.sql;
+
+20  视图
+        本质是对复杂查询语句的封装
+        create view v_students_scores as
+        select students.name,scores.score,subjects.name as subject
+        inner join students on scores.stuid = students.id
+        inner join subjects on scores.subid = subjects.id
+        where students.isDelete = 0;
+
+        show tables;
+
+        alter view v_students_scores as 
+        ...
+
+21  事务
+        一个业务逻辑需要多条sql语句完成时，其中一条sql语句出错，
+        则希望整个操作回退，这就是事务的功能。
+        要求：表的引擎是innodb或bdb
+        show create table students;
+        alter table students engine = innodb;
+        事务语句：begin(开启)、commit(提交)、rollback(回滚)
+        使用事务的情况：更改数据如insert delete update
+        being; # 开启事务
+        update students set name = "new_name" where id = 1; # 内存中修改
+        commit; # 提交修改到物理存储
+        rollback; # 取消begin后对数据的修改，必须在commit之前。
+
+22  索引
+        数据库的读写操作比例大概为10:1，因此主要考虑优化查询。
+        索引可以提高访问效率和查询速度。
+        主键和唯一索引都是索引。
+        对于列：选择小的、简单的、非空的数据类型。
+        类型：单列索引、组合索引。
+        查看表中索引：show index from students;
+        创建索引：create index new_index on students(name(10),gender);
+        删除索引：drop index new_index on students;
+        查看语句执行时间：set profiling = 1;
+                          sql语句
+                          show profiles;
+
+23  与python交互
+        安装：sudo apt-get install python3-pymysql或sudo pip3 install PyMySql
+        导入：from pymysql import *
+              在pycharm中导入，要将/usr/local/lib/python3.5/dist-packages添加到搜索路径
+              在终端交互式环境不需添加。
+        try:
+            conn = Connect(
+                host="localhost",
+                port=3306,
+                user="root",
+                passwd="huapassword",
+                db="database1",
+                charset="utf8"
+            )
+
+            cursor1 = conn.cursor()
+            name = input("请输入姓名：")
+            birthday = input("请输入生日：")
+            params = [name,birthday]
+            sql1 = "insert into students values (0, "new_student", 1, "2000-01-06", 0)"
+            cursor1.execute(sql1)
+            # 参数化，注意%s不同于python的格式化，只起占位符作用，且表示任意类型数据。
+            cursor1.execute("insert into students(name,birthday) values (%s, %s)",params)
+            conn.commit()
+            sql2 = "select * from students"
+            cursor1.execute(sql2)
+            line1 = cursor1.fetchone()
+            lines = cursor1.fetchall()
+            print(line1)
+            for line in lines:
+                print(line)
+            cursor1.close()
+            conn.close()
+        except Exception as e:
+            print(e)
+
+
+################################################################
+
+1    mongodb
+        mongodb是个非关系型数据库(nosql)，分布式计算。
+        nosql分类：
+            列存储：Hbase
+            文档存储：MongoDB
+            key-value存储：redis
+            图存储：Neo4J
+        mongodb三元素：数据库，集合(mysql中的表)，文档(msyql中的记录)
+                       文档是由减值对构成的对象，是json的扩展bson形式。
+                       集合，由多个文档构成，如：
+                       {"name":"student1","gender":1,"birthday":"2000-01-01"}
+                       {"book_name":"little prince","price":"10$"}
+                       {"user_name":"user1","passwd":"passwd1"}
+                       三个文档结构不一，构成一个集合。
+                    
+2   安装及启动
+        安装：sudo apt-get install mongodb
+        启动服务端：sudo service mongodb start
+              sudo service mongodb stop
+              sudo service mongodb restart
+        启动客户端：mongo
+        安装图形界面：下载robo3t，解压到/usr/local/，重命名为robo3t
+                      mkdir ~/robo-backup
+                      mv /usr/local/robo3t/lib/libstdc++* ~/robo-backup/
+                      从终端或文件夹启动：/usr/local/robo3t/bin/robo3t
+3   数据库操作
+        db：查看当前数据库
+        查看所有数据库：show dbs
+        切换数据库：use database1 # mongodb没有创建，直接切换到要创建的数据库，
+                    创建集合后就创建了数据库。
+        删除数据库：db.dropDatabase()
+
+4   集合操作
+        创建集合：db.createCollection("students")
+        查看当前数据库集合：show collections
+        删除集合：db.students.drop()
+        
+5   数据操作
+        增：db.students.insert({name:"student1",gender:true})
+        查：db.students.find({name:"student1"}) db.students.findOne() db.students.find().pretty() # 格式化查询
+        改: db.students.update({name:"student1"},{name:"student2"}) # 改变整个文档
+            db.students.update({name:"student1"},{$set:{gender:false}},{multi:true}) # 改变指定字段gender
+        删：db.students.remove({gender:false},{justOne:true})
+        比较运算符：$lt,$lte,$gt,$gte,$ne
+                    db.students.find({age:{$gt:25}})
+        逻辑运算符：
+                    与：db.students.find({gender:false, age:{$gt:10}})
+                    或：db.students.find({$or:[{gender:false},{age:{$gt:10}}]})
+        范围运算符：
+                    in：db.students.find({age:{$in:[10,20]}}) # 查询10或20,而非10到20 
+                    nin:db.students.find({age:{$nin:[10,20]}})
+        正则表达式：
+                    //：db.students.find({name:/^华/}) 
+                    $regex: db.students.find({name:{$regex:"^华"}})
+        自定义查询：
+                    db.students.find({$where:function(){return this.age>20}})
+                    db.students.find({$where:function(){return this.name.startsWidth("华")}})
+        limit与skip:
+                    db.students.find().skip(3).limit(2) # 跳过3条文档，查询2条文档
+        投影(查询指定字段):
+                    db.students.find({$where:function(){return this.age>10}}, {name:1,_id:0})
+                    # find中第一个字典表示条件，第二个字典指定字段，显示值为1的字段，值为0也可不写。
+        排序：
+                    db.students.find().sort({age:1, score:-1})
+        统计：
+                    db.students.find({$where:function(){return this.age>10}}).count()
+                    db.students.count({$where:function(){return this.age>10}})
+        去重：
+                    db.students.distinct({"class", {age:{$gt:20}}}) # 字典中前一个值代表去重字段，后
+                                                                      一个值代表查询条件
+
+6   高级操作
+        聚合-分组：
+            db.students.aggregate([{$group:{_id:"$gender", counter:{$sum:1}, avgage:{$avg:"$age"}},
+                                    total:{$push:"$$ROOT"}}])
+            # group代表分组管道，_id表示分组字段，后面每个键值对代表一个表达式。
+        聚合-过滤：
+            db.students.aggregate([{$match:{age:{$gt:10}}}])
+            db.students.aggregate([
+                {$match:{age:{$gt:10}}},
+                {$group:{_id:"$gender", counter:{$sum:1}}}
+            ])
+        聚合-投影(显示部分数据):
+            db.students.aggregate([
+                {$group:{_id:"$gender", counter:{$sum:1}}},
+                {$project:{_id:0, counter:1}}
+            ])
+        聚合-排序：
+            db.students.aggregate([
+                {$group:{_id:"$gender", counter:{$sum:1}}},
+                {$sort:{_id:-1}}
+            ])
+        聚合-limit-skip：
+            db.students.aggregate([
+                {$group:{_id:"$gender", counter:{$sum:1}}},
+                {$project:{_id:0, counter:1}},
+                {$skip:2},
+                {$limit:3}
+            ])
+        聚合-unwind-拆分数组字段：
+            db.clothes.aggregate([
+                {$unwind:"$size"}}
+            ])
+            db.clothes.aggregate([
+                {$unwind:{path:"$size",preserveNullAndEmptyArrays:true}}
+            ])
+
+7   索引
+        创建索引：
+            db.students.ensureIndex({"name":1},{"unique":true})
+            db.students.ensureIndex({name:1, age:1})
+        查看索引：
+            db.students.getIndexes()
+        删除索引：
+            db.students.dropIndexes("name")
+
+8   安全性
+        三种角色：root, Read, readWrite
+        创建root用户：
+            use admin
+            db.createUser({
+                user: "huashaojie",
+                pwd: "huapassword",
+                roles: [{role: "root", db: "admin"}]
+            })
+        修改配置文件：
+            sudo vim /etc/mongodb.conf
+            找到#auth = true,取消注释。
+            重启mongodb服务：sudo service mongodb restart
+        登录：
+            mongo -u huashaojie -p huapassword --authenticationDatabase admin
+        创建readWrite用户：
+            use database1
+            db.createUser({
+                user:"huashaojie1",
+                pwd:"huapassword",
+                roles:[{role:"readWrite", db:"database1"}]    
+            })
+        登录：
+            mongo -u huashaojie1 -p huapassword --authenticationDatabase database1
+            use database1 # 只能读写database1
+        对于每个项目，root用户给该项目用户分配一个账户(创建一个用户)，只能操作自己项目的数据库
+
+9   与python交互
+    sudo pip3 install pymongo
+    from pymongo import *
+    建立无用户连接：client = MongoClient("mongodb://localhost:27017")
+    建立有用户连接：client = MongoClient("mongodb://huashaojie1:huapassword@localhost:27017/database1")
+    db = client.database1
+    students = db.students
+
+##################################################################
+
+1   安装、启动redis
+        sudo apt-get update
+        sudo apt-get install redis-server
+        查看redis-server: ps ajx | grep redis
+        启动redis-server: sudo service redis start
+        停止redis-server: sudo service redis stop
+        重启redis-server: sudo service redis restart
+        连接redis-server: redis-cli
+    
+2   操作
+        创建：set "py1" "hello"
+        查：get py1
+        删：delete py1
+
+3   hash
+        创建：hset py2 name "huashaojie"
+        查：hget py2
+        删：delete py2
+        
+4   list
+        插入：lpush py4 "new_value"
+        
+5   set
+
+6   zset
+
+7   与python交互
+        sudo pip3 install redis
+        import redis
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        

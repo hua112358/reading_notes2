@@ -1,0 +1,143 @@
+0 帮助
+	帮助命令:ls --help，man ls。
+	查看目录结构:tree
+
+1 cat/more
+	cat:显示文件全部内容，-b空行不显示行号，-n空行也显示行号。
+	more:分屏显示文件内容，空格键或f键向前滚屏，b键向后滚屏，enter键向前滚一行，q键退出。
+
+2 grep
+	grep:搜索文本内容，-i忽略大小写，-n显示行号，-v显示不含搜索内容的行。^匹配行首，$匹配行尾。
+
+3 echo和重定向
+	echo:在终端上显示输入。
+	重定向:将原本显示在终端上的内容输出或追加到其他文件中，>表示输出，>>表示追加。常与echo、ls等命令配合使用。如文件不存在，则先创建文件。
+
+4 管道（|）
+	管道:接受一个命令的输出作为另一个命令的输入。
+	常用管道命令有:more,grep。如：ls -lha | more,ls -lha | grep '^s'。
+
+5 远程管理命令
+	关机/重启:shutdown 选项 时间，默认关机，-r表示重启，默认时间为1分钟，now表示马上，+10表示10分钟后执行，20:20表示20:20执行，shutdown -c表示取消。在日常维护时，记住加-r，因为关闭服务器后再开启很麻烦。
+	网卡和ip:网卡是计算机交流的硬件，ip是网卡的唯一标识。ifconfig查看网卡配置信息，ping ip检查本机到目标ip的连接是否正常。
+	ssh:在ssh客户端和ssh服务器之间进行数据传输，数据经过加密、压缩，安全、速度快。
+	端口号:通过ip找到服务器，通过端口号找到服务器上的服务器应用程序，由应用程序提供服务。常见服务器端口号有：ssh服务器(22)、web服务器(80)、HTTPS(443)、FTP服务器(21)。请求服务时，用ip:端口号的形式，默认端口号可以省略。www.baidu.com:80
+	ssh [-p port] user@remote:port是ssh服务器端口号，默认22，user是服务器用户，默认为当前用户，remote是服务器ip。
+	scp:用于远程拷贝，格式：scp [-P port] 01.py user@remote:Desktop/01.py,scp [-P port] -r user@remote:Desktop/folder folder
+	windows与linux传输文件常用FTP，端口号21
+	ssh免密码登陆:ssh-keygen,ssh-copy-id -p port user@remote,客户端私钥加密数据，传递给服务器用公钥解密，服务器用公钥加密数据，传递给客户端用私钥解密。
+	配置服务器别名:在~/.ssh/中创建config文件，在其中添加
+		Host myserver
+			HostName 172.16.140.1
+			Usesr huashaojie
+			Port 22
+		添加别名后：scp -r folder myserver:Desktop/folder
+6 硬链接数:有几种方式访问该文件或文件夹（绝对路径，向上一级（..）,当前级（.））,对于文件a而言，硬链接数为1，对于只包含的文件目录a，硬链接数为2，对于包含n个目录的目录c，硬链接数为n+2。
+	
+7 修改文件/目录权限:chmod +/-rwx test.py(+表示增加权限，-表示取消权限)
+
+8 组
+	添加/删除组:sudo groupadd group1,sudo groupdel group1
+	修改文件/目录所属组:sudo chgrp -R 组名 文件/目录,-R表示递归修改。实际开发中，先确定组的权限，再将不同级别用户添加到不同组。
+
+9 用户管理
+	创建用户:sudo useradd -m -g 组名 user，-m表示建立家目录，-g后跟所属组名，默认会创建与用户同名的组。sudo passwd user，设置用户密码，否则无法登陆系统，也可用于修改密码。
+	删除用户:sudo userdel -r user，-r表示删除家目录。
+	查看用户信息:id user，查看user的用户id和组id。用户信息在/etc/passwd下，组信息在/etc/group下。
+	查看登陆用户:who，查看所有登陆用户，whoami，查看当前登陆用户。
+	主组/附加组:附加组如sudo组，usermod -g 组名 user,修改主组，usermod -G 组名 user，添加到附加组，重新登陆后生效。
+	shell:shell即执行终端命令的软件，linux下默认为dash，usermod -s /bin/bash user，让用户user用bash而不是dash作为shell。
+	切换用户:su - user,-表示切换到user的家目录，省略则停留在当前位置。只写su表示切换到root身份，不推荐使用。
+
+10 which
+	查看可执行文件的位置:which passwd
+	bin表示二进制可执行文件，如ls，sbin表示系统管理二进制可执行文件，系统管理员专用，/usr/bin是后期安装的软件，/usr/sbin是超级用户的管理程序。
+
+11 修改文件权限（对应ls -l中的3，4，1列）
+	chown:修改拥有者，chown user 文件/目录
+	chgrp:修改组，chgrp -R 组名 文件/目录，-R表示递归修改
+	chmod:修改权限 chmod +/-rwx -R 文件/目录,-R表示递归修改。chmod -R 755 文件/目录，7代表拥有者权限，5代表组用户权限，5代表其他用户权限。4代表读，2代表写，1代表执行。
+
+12 系统信息相关命令
+	时间和日期:date,cal -y,-y表示年份。
+	磁盘信息:df -h,du -h 目录名。
+	进程信息:ps aux，查看进程详细信息，a表示查看所有用户，u表示详细信息，x表示所有进程包括非终端打开的进程。top动态显示进程，kill -9 进程id，-9表示强行终止。
+	其他命令:find 路径 -name "*.py"，查找文件/目录。ln -s 源文件绝对路径 软链接名，创建软链接，-s表示软，缺省表示硬链接，绝对路径软链在移动后仍然能使用。硬链接相当于复制了一份，是文件的小名，源文件删除后硬链接仍然可以使用。linux中，文件名和数据内容分开存储。只有一个文件的所有硬链接全部删除后，文件才真正删除了。
+
+13 打包压缩
+	windows常用rar，mac常用zip，linux常用tar.gz。tar是linux常用备份工具，打包不压缩。
+	tar -cvf 打包后文件.tar 被打包文件1 被打包文件2。。。，打包；tar -xvf 打包后文件.tar，解包。参数基本不变。
+	gzip负责压缩，tar和gzip合用打包并压缩，tar用参数z直接调用gzip生成tar.gz压缩文件。tar -zcvf 打包后文件.tar.gz 被打包文件1 被打包文件2，打包并压缩；tar -xcvf 打包后文件.tar.gz -C 目标路径，解包并解压缩。
+	bzip2用法和gzip类似，tar -jcvf 打包后文件.tar.bz2 被打包文件1 被打包文件2 。。。，打包并压缩，tar -jxvf 打包后文件.tar.bz2 -C 目标路径，解包并解压缩。
+
+14 软件
+	apt是Linux下常用的包管理工具
+	sudo apt install 软件包，安装
+	sudo apt remove 软件包，卸载
+	sudo apt upgrade 软件包，升级，不加软件包则更新所有软件包。
+	软件源与镜像源，主服务器与镜像服务器，内容一样。apt安装的软件包只能是服务器上有的软件包。
+
+15 终端多屏
+	ctrl+shift+t添加屏幕，ctrl+1切换到屏幕1。
+
+16 vim卡死
+	ctrl+s是linux的锁屏键，按ctrl+q退出锁屏。
+	
+
+17 pycharm
+	打开：~/下载/pycharm-2017.3/bin/pycharm.sh
+	创建软链接在终端中打开：ln -s ~/下载/pycharm-2017.3/bin/pycharm.sh /usr/bin/pycharm
+	锁定到启动器。
+
+18 ssh
+	dpkg命令：debian packge缩写，debian是linux一个非常流行的发行版，Ubuntu也是其分支。debian的分支沿用其命令
+		dpkg命令类似apt命令，都源自Debian，用于软件的安装，更新和移除。
+	dpkg -l package1:列表显示package1的信息
+	dpkg -l | grep ssh:列表显示所有软件包中含ssh的信息
+	ssh用于加密传输数据，常用于远程管理linux服务器
+	客户端：ssh-client，可以访问服务器
+	服务器：ssh-server，可以被客户端访问
+	
+	安装客户端ssh：sudo apt-get install openssh-client
+	安装服务器ssh：sudo apt-get install openssh-server
+	查看ssh服务是否启动：sudo ps -e | grep ssh
+	启动ssh服务：sudo service ssh start
+	远程登陆服务器：ssh username@ip
+	断开远程连接：exit
+
+	ssh密钥设置
+	客户端创建一对钥匙：公钥和密钥。把公钥放到服务器上，这样当登录远程 服务器时，
+	客户端软件就会向服务器发出请求，请求用你的密匙进行认证。服务器收到请求之后，
+	先在你在该服务器的宿主目录下寻找你的公匙，然后检查该公匙是 否是合法，
+	如果合法就用公匙加密一随机数（即所谓的challenge）并发送给客户端软件。
+	客户端软件收到 “challenge”之后就用私匙解密再把它发送给服务器。
+	因为用公匙加密的数据只能用密匙解密，服务器经过比较就可以知道该客户连接的合法性。
+	
+	第一步：
+	进入root
+	su root
+	第二步：
+	在客户端产生公钥id_rsa.pub和密钥id_rsa,钥匙类型可以用参数指定：dsa，rsa，rsa1，一般用rsa
+	ssh-keygen -t rsa
+	第三步：
+	把公钥拷到服务器上，写入授权列表文件
+	scp /root/.ssh/id_rsa.pub root@192.168.30.129:/root/.ssh/authorized_keys
+	第四步：
+	测试无密码登陆
+	ssh username@192.168.30.129
+
+19 终端中结束程序
+	ctrl+c：结束程序
+	ctrl+z：程序转入后台运行，终端可以执行其他命令
+	bg：查看终端中后台程序
+	fg：后台程序转入前台执行。
+
+20 linux文件目录结构
+    /lib /usr/lib /usr/local/lib
+    /lib是操作系统库目录
+    /usr/lib是用户应用程序自带库目录，如python的abc模块
+    /usr/local/lib是用户为应用程序新安装的库目录，如python的pymysql模块
+
+21 设置虚拟机共享文件夹
+    设置》选项》选择主机文件夹作为共享文件夹
+    虚拟机上共享文件夹在/mnt/hgfs/下。

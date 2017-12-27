@@ -1,0 +1,18 @@
+1   pytorch官网提供用pip3安装torch的方法，因为网络的原因速度很慢。
+    可以翻墙，用idm下载安装文件.whl，再用命令pip3 install 安装文件.whl
+
+2   对于普通的python包安装，pip3速度也很慢。
+    可以编写配置文件:
+        mkdir ~/.pip
+        cd ~/.pip
+        vim pip.config
+        添加镜像源：
+        [global]  
+        timeout = 6000  
+        index-url = http://pypi.douban.com/simple/  
+        [install]  
+        use-mirrors = true  
+        mirrors = http://pypi.douban.com/simple/  
+        trusted-host = pypi.douban.com
+    或者临时镜像：
+        sudo pip3 install package_name -i https://pypi.douban.com/simple

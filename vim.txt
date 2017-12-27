@@ -1,0 +1,46 @@
+1 设置vim
+	vim ~/.vimrc
+	# 设置行号
+	set nu
+	# 设置缩进为4个空格
+	set tabstop=4
+	set softtabstop=4
+	set shiftwidth=4
+	set expandtad
+	set autoindent
+	set smartindent
+
+2 重要命令
+	yy：复制一行
+	p：粘贴
+	dd：剪切一行
+	3yy/3dd：复制/剪切3行
+	
+	end键/$：调到行尾
+	0/^：调到行首
+	G：调到结尾
+	gg：调到头部
+	
+	ctrl+f：下一页
+	ctrl+b：上一页
+	
+	H：到屏幕顶部
+	M：到屏幕中部
+	L：到屏幕底部
+
+	多行注释：ctrl+v，上下选中多行，大写I键，插入#符号，esc后多行被注释。
+	多行取消注释：ctrl+v，上下选中多个注释#，d删除。
+
+	查找替换
+		向前搜索 /word （n向前，N向后）
+		向后搜索 ？word	（n向后，N向前）
+		
+		替换光标所在行第一个 :s/old/new
+		替换光标所在行全部   :s/old/new/g
+		替换全文且询问       :%s/old/new/gc
+		替换3到10行,全部、忽略大小写、询问          :3,10s/old/new/gic
+
+
+
+
+

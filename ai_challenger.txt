@@ -1,0 +1,60 @@
+1   熟练使用列表生成式以及通过列表构造字典，了解字典生成式
+        列表生成式
+            names = [image["image_id"] for image in images]
+            labels = [image["label_id"] for image in images]
+            names_labels_list = [[image["image_id"], image["label_id"]] for image in images]
+            names_labels_list = [[name, label] for name in names for label in labels]
+        通过列表构造字典
+            names_labels_dict = dict(zip(names,labels))
+            names_labels_dict = dict(names_labels_list)
+        字典生成式(速度慢，不推荐)
+            names_labels_dict = {name:label for name in names for label in labels }
+            names_labels_dict = {name:label for (name, label) in zip(names,labels)}
+            names_labels_dict = {name:label for (name, label) in names_labels_list}
+
+2   python图像处理
+        import json
+        with open("validation/info.json") as f:
+            info = json.loads(f.read())
+        labels = [int(image["label_id"]) for image in info]
+        names = [image["image_id"] for image in info]
+        names_labels_list = [[image["image_id"], image["label_id"]] for image in info]
+        names_labels_dict = dict(names_labels_list)            
+        
+        import skimage.io as io
+        from skimage import data_dir,transform
+        def convert(f):
+            f = io.imread(f)
+            f = transform.resize(f,(32,32))
+            return f
+        str="validation/validation/*.jpg"
+        coll = io.ImageCollection(str,load_func=convert)
+        print(len(coll))
+
+        images = [transform.resize(io.imread("validation/validation/"+name),(32,32))for name in names]
+        images = np.array(images)
+        print(images.shape)
+        import numpy as np
+        np.save("images_validation.npy",images)
+        
+3   提高准确率
+        数据：增加像素数，32×32>227*227
+        模型：设计模型结构，层数、每层神经元数、卷集层结构、池化层结构、激活函数。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

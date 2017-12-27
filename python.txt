@@ -1,0 +1,2193 @@
+1 利用dir函数
+	dir(对象名)
+
+2 id函数和isinstance函数
+	id(a)：查询a的内存地址。
+	isinstance(a,list)
+
+3 None
+	a=None，使用None为不知道类型的变量先赋值。
+
+4 is和==
+	is判断是否为同一对象，==判断值是否相等，判断是否为None应该用is。
+
+5 私有
+	在属性或方法前加两个下划线，__secret(),__secretAttribute，私有属性和方法在类外不能访问。
+	python中，并没有真正的私有，在类外访问私有属性和方法，可以用下划线+类名+私有属性访问：_ClassName__secret(),_ClassName_secretAttribute,不推荐。
+	子类可以通过调用父类共有方法间接访问父类私有属性和方法。
+
+6 对于父类方法
+	覆盖：完全重写，重新定义
+	扩展：在重新定义的方法中加入，super().父类方法。
+	调用：在重新定义的方法中加入，父类名.父类方法(self),python3不推荐。
+
+7 多继承
+	class C(A,B),c=C(),c继承了A,B所有的属性和方法。尽量避免A,B拥有同样的属性和方法。c.__mro__，显示c的方法搜索顺序。
+	python3所有类的默认基类是object（新式类），python2不是（经典类）。因此为了代码通用，没有父类时，这样定义类：class c(object)。 
+
+8 类的三大特性
+	封装、继承（代码重用）、多态（代码灵活）
+
+9 多态
+	不同的子类对象调用相同的父类方法产生不同结果。
+
+10 类对象
+	python一切皆对象，类也是一个特殊的对象。
+		class A(object):
+			count=0
+			def __init__(self,name):
+				self.name=name
+				count+=1
+	count即类对象A的属性，即类属性。a=A(),a是实例/对象，而不是类对象。
+
+11 类方法
+	类方法就是针对类对象定义的方法。
+	class Tool(object):
+		
+		count=0
+		@classmethod
+		def 类方法名(cls):
+			pass
+		
+		@classmethod
+		def show_tool_count(cls):
+			print(clf.count)
+		
+		def __init__(self,name):
+			self.name=name
+			count+=1
+
+	tool1=Tool("斧头")
+	Tool.show_tool_count()
+	装饰器告诉python这是一个类方法。cls代表类，与self类似，可用cls.访问类属性或其他类方法。
+
+12 静态方法
+	没有self参数
+	需要访问实例/对象属性的方法是实例/方法，需要访问类属性的方法是类方法，都不需要的方法可以定义为静态方法。
+	class Dog(object):
+		# 类属性count
+		count=0
+
+		# 类方法
+		# 有cls参数
+		@classmethod
+		def show_count(cls):
+			print(cls.count)
+
+		# 实例/对象方法
+		# 有self参数
+		def __init__(self,name):
+			# 实例/对象属性name
+			self.name=name
+			print(self.name)
+
+		# 静态方法
+		# 没有self参数
+		@staticmethod
+		def run():
+			# 即不访问实例/对象属性，也不访问类属性
+			print("小狗在跑。。。")
+
+		# 将静态方法改成实例/对象方法
+		# 加上self参数
+		@staticmethod	
+		def run():
+			print("小狗在跑。。。")
+	静态方法调用与类方法相同，直接通过类名调用。Dog.run()
+	既需要访问类属性，又要访问实例属性，则定义为实例方法。
+
+13 类的__str__()方法
+	__str__是一个实例/对象方法，必须返回字符串，返回的字符串会输出到屏幕上。
+	class Person():
+		def __init__(self,name):
+			self.name=name
+		def __str__(self):
+			return ("我是%s" % self.name)
+
+13 单例设计模式
+	系统中只有唯一一个实例。如音乐播放、回收站、打印机。
+
+14 new方法
+	__new__(cls)，object内置为对象分配内存的静态方法，返回对象的引用给python解释器，作为第一个参数传递给__init__(self)方法。
+	重写new方法
+	def MusicPlayer(object):
+		def __new__(cls,*args,**kwargs):
+			print("创建对象，分配内存")
+			# 为对象分配内存
+			instance=super().__new__(cls)
+			# 返回对象的引用
+			return instance
+		def __init__(self):
+			print("初始化对象")
+
+15 单例设计模式代码实现
+	class MusicPlayer(object):
+		instance=None
+		# 定义类属性init_flag让类只初始化一次
+		init_flag=False
+		def __new__(cls,*args,**kwargs):
+			if cls.instance is None:
+				cls.instance=super().__new__(cls)
+				return cls.instance
+			return cls.instance
+		def __init__(self):
+			if MusicPlayer.init_flag:
+				return
+			print("初始化播放器")
+			MusicPlayer.init_flag=True
+
+16 异常
+	# 异常的传递
+	# 函数或方法执行时遇到异常，会将异常传递给主程序，只有主程序没有异常处理时，程序才会终止。
+	# 利用异常的传递性，在主程序中捕获、处理异常。
+	def demo():
+		return int(input("请输入一个整数"))
+	try:
+		print(demo())
+	except ValueError:
+		print("ValueError")
+	except ZeroDivisionError as z:
+		print(z)
+	except Exception as e:
+		print("未知错误： %s" % e)
+	# 没有异常时执行
+	else:
+		pass
+	# 有无异常均执行
+	finally:
+		pass
+
+17 主动抛出异常
+	def input_password():
+		passwd=input("请输入密码")
+		if len(passwd)>=8:
+			return passwd
+		print("主动抛出异常")
+		ex=Exception("密码长度不够")
+		raise ex
+	try:
+		input_password()
+	except Exception as result:
+		print(result)
+
+18 模块
+	每个模块都有__file__显示模块完整路径，如import random,random.__file__
+	模块被导入时，没有缩进的代码会被执行一遍。不想让其执行，使用__name__属性测试。
+	def main():
+		模块内代码
+	if __name__==__main__:
+		main()
+	
+19 包
+	包就是包含多个模块的目录，包下有一个__init__.py文件，__init__.py中包含有该包对外界提供的模块。
+	在__init__.py中加入如下代码:
+	from . import module1
+	from . import module2
+	则在其他python文件中，就可以导入模块module1和module2
+
+20 发布包
+	创建setup.py 文件： from distutils.core import setup,setup(多值字典参数)
+	构建模块：python3 setup.py build
+	生成压缩包：python3 setup.py sdist
+	
+21 安装包
+	解压：tar -zxvf package.tar.gz
+	安装：python3 setup.py install
+	卸载：用module.__file__找到包位置，直接删除该目录。
+
+22 pip
+	sudo pip install pygame(pip代表安装到python2的环境，pip3代表安装到python3的环境)
+	sudo pip uninstall pygame
+	sudo pip3 install pygame
+	sudo pip3 uninstall pygame
+
+23 os模块
+	rename,remove,listdir,mkdir,rmdir,getcwd,chdir,path.isdir(判断是否为目录),system
+	
+
+24 eval函数
+	eval()接受一个字符串，把它当作有效表达式(python代码)并执行且返回。
+	例如：eval(input("请输入算术题"))（不推荐使用，不要滥用eval）
+
+25 常量
+	python中没有真正的常量，使用全大写，单词用下划线连接的变量表示常量。
+
+26 导入模块顺序
+	官方标准模块》第三方模块》程序其他模块
+
+27 拷贝
+	浅拷贝：a=b，拷贝内存地址的引用。
+	深拷贝：import copy,a = copy.deepcopy(b),列表中原变量变化，深拷贝的变量不变，浅拷贝的变量变化，copy.deepcopy是递归拷贝，copy.copy是非递归拷贝。
+
+28 私有化
+	变量前有一个下划线的，表示模块私有，在模块内可以访问，模块外导入不能访问。
+	_a = 10,__b = 20,from a import * ,print(_a)出错，print(__b)出错。import a,print(_a)不出错，print(__b)不出错。
+
+29 property 
+	class Test(object):
+		def __init__(self):
+			self.__num = 10
+		@property
+		def num(self):
+			return self.__num
+		@num.setter
+		def num(self,newNum):
+			self.__num = newNum
+
+30 闭包
+	在函数1内部定义函数2，函数2用到函数1的参数，并且函数1将函数2作为返回值。
+	def test(num):
+		def test_in(num_in):
+			print(num+num_in)
+		return test_in
+	f = test(100)
+	f(200)得到300
+	f(400)得到500
+	即每次生成的函数2即f对应函数1的不同参数num，当num的个数较多时，使用闭包较为方便。
+
+31 代码的开放和封闭原则
+	开放：可以在代码块外部进行功能扩展
+	封闭：已经完成的代码块内部不要进行修改。
+
+32 装饰器(python语法糖)
+	def w1(func):
+		def inner1(*args,**kwargs):
+			print("正在验证。。。")
+			if 验证成功:
+				ret = func(*args,**kwargs)
+				return ret
+			else:
+				print("验证失败")
+			
+		return inner1
+	def w2(func):
+		def inner2(*args,**kwargs):
+			print("正在验证。。。")
+			if 验证成功:
+				ret = func(*args,**kwargs)
+				return ret
+			else:
+				print("验证失败")
+		return inner2
+	
+	# f1 = w1(f1)
+	@w1
+	def f1():
+		print("正在执行f1。。。")
+	# f2 = w1(f2)
+	@w2
+	def f2():
+		print("正在执行f2。。。")
+	# f3 = w1(f3) 把inner2穿给w1，返回的f3指向inner1
+	@w1
+	# f3 = w2(f3) 把f3传给w2，返回的f3指向inner2
+	@w2
+	def f3(x,y):
+		print("正在执行f3。。。")
+		return ret
+	
+	多个装饰器类似，对于f3，先执行靠近函数的w2，在执行w1。
+
+	带参数的装饰器：
+	def wrapper(装饰器的参数):
+		def w1(func):
+			def inner1(*args,**kwargs):
+				print("正在验证。。。")
+				if 验证成功:
+					ret = func(*args,**kwargs)
+					return ret
+				else:
+					print("验证失败")
+	return w1
+
+	@wrapper(param) # wrapper(param)返回w1，@w1作为装饰器装饰f4
+	def f4():
+		return 0
+	
+33 作用域
+	globals():查看所有全局变量
+	locals():查看所有局部变量
+	python搜索变量规则：LEGB规则，locals>enclosin(闭包中常见)g>globals>builtins
+
+34 动态性
+	class A(object):
+		def __init__(self,name):
+			self.name = name
+	def run():
+		print("正在跑。。。")
+	a = A("a")
+	给对象动态添加属性：a.age = 10
+	给对象动态添加方法：import types,a.run = types.MethodType(run,a),a.run()
+	给类动态添加方法：	
+	@staticmethod
+	def func1():
+		print("func1")
+	
+	@classmethod
+	def func2(cls):
+		print("func2")
+	a1 = A(object)
+	a1.func1 = func1
+	a1.func2 = func2
+
+35 限制对象属性
+	class A(object):
+		__slots__ = ("name","age")
+		def __init__(self):
+			print("初始化。。。")
+
+	a = A()
+	a.name = "a",a.age = 10
+	a.sex = "male" # 报错
+
+36 python高级特性(面试常考)
+	生成器、迭代器、装饰器、闭包
+	迭代器a，有next(a)返回下一个值，for循环的原理即通过iter方法将可迭代对象如list，dict转变为迭代器，或者直接对一个迭代器
+		不断调用next方法，不断返回下个值。
+	生成器b，在定义中有调用yield方法，可以使用next方法返回下一个值
+	迭代器/生成器与列表的区别在于，生成器只是保存了一种生成值的模式，如(i**2 for i in range(10))，在调用next方法时才真正生成值。
+	迭代器不一定是生成器，而生成器一定是迭代器。
+	迭代器有yield方法。
+
+37 生成器
+	# 函数中有yield，则调用函数不会执行函数中代码，而是返回一个生成器。
+	def fib():
+		count = 0
+		a,b = 0,1
+		for i in range(10):
+			a,b = b,a+b
+			yield(a)
+	a = fib() # a即生成器
+	next(a) # 每次调用next程序都停在yield处,下一次调用next从yield处开始执行代码，到yield处再次停止。或者用a.__next__()方法。
+	我们一般不用next获取返回值，而是用for循环。
+	a.send("param") # send函数与next类似，但是还会传递"param"作为yield的结果，即执行完yield(a)后会返回"param"
+	但是第一次调用send会出错，可以先调用next在调用send或者直接调用send但是传一个None作为参数。
+	def test():
+		i = 0
+		while i<5:
+			if i==0:
+				temp = yield i
+			else:
+				yield i 
+	g = test() 
+
+	另一种方法定义生成器：
+	g = (i**2 for i in range(10))
+	与列表生成式很相似：
+	l = [i**2 for i in range(10))
+
+38 生成器的用途-多任务实现方式之一(协程实现) # 多任务三种实现方式：协程、线程、进程
+	def test1():
+		while True:
+			print("---1---")
+			yield None
+	def test2():
+		while True:
+			print("---2---")
+			yield None
+	t1 = test1()
+	t2 = test2()
+	while True:
+		t1.__next__()
+		t2.__next__()
+
+39 元类
+	python一切皆对象，类本身也是对象。类也可以动态创建。
+	用type动态创建类：
+	def run(self):
+		print("%s is running..." % self.name)
+	Man = type("Man",("Person",),{"name":"huashaojie","age":20,"run":run}) # ()中表示继承的父类，{}表示类的属性或方法
+	Man.__class__>>type
+	元类即创建类的类，即Class1 = MetaClass()，MetaClass即元类，type即元类。
+	a = 100,b = "hello"
+	type(a)>>int,type(b)>>str,或者:a.__class__>>int,b.__class__>>str
+
+	python2中修改默认元类
+	def upper_attr(future_class_name,future_class_parents,future_class_attr):
+		newAttr = {}
+		for name,value in future_class_attr.items():
+			if not name.startswith("__"):
+				newAttr[name.upper()] = value
+		return type(future_class_name,future_class_parents,newAttr)
+
+	class Foo(object):
+		__metaclass__ = upper_attr # 设置Foo类的元类为upper_attr，upper_att即为元类，修改了默认的元类以及类的创建方式，类属性改为大写。
+		bar = "bip"
+	print(hasattr(Foo,"bar"))>>False
+	print(hasattr(Foo,"BAR"))>>True
+	
+	！99%的用户不会用到元类。
+
+40
+	小整数池：[-5,257)内的整数对象都是python提前建立好的，常驻内存，不会被垃圾回收，如：a = 100,b = 100>>id(a) == id(b)
+	单个字母和单个单词与小整数池一样，也是常驻内存。如：a = "hello",b = "hello">>id(a)==id(b)
+	大整数池：不在小整数池内的整数对象是动态创建的，如：A = 1000,B = 1000>>id(A)!=id(B)
+	intern机制：对于重复创建同一整数或字母，单词，字符串（不包含空格等特殊字符）对象，python不会重复创建内存空间，而是通过引用计数的方法。
+
+41 GC（垃圾回收机制）
+	python与c，c++不同，有自动垃圾回收机制，当一个内存空间的引用计数refcnt（由c语言编写）为0，回收内存空间。
+	一个python垃圾回收机制不能满足需要的例子(循环引用/双链表)：
+	import gc
+	gc.disable()
+	class C(object):
+		pass
+	def f():
+		while True:
+			c1 = C()
+			c2 = C()		
+			c1.t = c2
+			c2.t = c1
+			del c1
+			del c2
+	c1，c2被删除之后，没有引用原本c1.t和c2共同指向的空间1，c2.t和c1共同指向的空间2仍然存在，但是引用计数为0，死循环不断占用内存空间，程序不稳定。
+
+43 隔代回收（引用计数机制为主，隔代回收机制为辅）
+	把所有新创建的对象放在一条链表中，称为0代链表；定期对0代链表检查，将所有有相互(循环)引用的对象的引用减1，如果对象引用变为0，说明该对象存在循环引用而
+		没有外部引用，删除该对象，剩下的对象组成1代链表；定期对1代链表执行同样的操作，得到2代链表。
+
+44 引用计数
+	+1：对象被创建、对象被引用、作为参数传入函数、作为列表元素
+	-1： del、函数的局部变量、删除列表
+	查看对象引用计数：import sys,a = "hello",sys.getrefcount(a)
+
+45 gc
+	import gc
+	gc.get_count()
+	gc.get_threshold()
+	gc.collect()
+	gc.garbage
+
+46 内建属性
+	dir(对象)
+	class Test(object):
+		def __init__(self,name):
+			self.name = name
+		# 修改访问属性的内建方法__getattribute__
+		def __getattribute__(self,obj):
+			if self.obj == "name":
+				print("log name") # 打印log访问属性日志
+				print("Change attribute")
+				return "newName"
+			else:
+				return object.__getattribute__(self,obj) # super(Test,self).__getattribute__(obj)
+
+47 __getattribut__
+	class Test(object):
+		def __init__(self,attr1,attr2):
+			self.attr1 = attr1
+			self.attr2 = attr2
+		def __getattribute__(self,obj):
+			print(obj)
+			if obj == "attr1":
+				return obj
+			else:
+				temp = object.__getattribute__(self,obj)
+				print(temp)
+				return temp
+		def func1(self):
+			print("func1")
+	c = Test("attr1","attr2")
+	print(s.attr1)
+	print(s.attr2)
+	c.func1() # 实际过程是，先调用__getattribute__函数，返回temp即func1，再调用func1方法。即c.func1()>>temp = c.__getattribute__(func1)>>temp(),其中temp指向func1函数。
+
+48 内建方法
+	map函数：map(lambda x:x**2,range(5)),map(lambda x,y,z:x+y+z,range(5),range(5),range(5))	
+	def f(x,y,z):
+		return x+y+z
+	map(f,range(5),range(5),range(5))
+	filter函数：与map函数相似，但是只返回运算结果为True（非0）的部分。
+	filter(lambda x:x%2,[1,2,3,4])>>[1,3]
+	filter(lambda age:age>=80,[32,10,99,100])>>[99,100],返回长寿者年龄。
+	reduce函数：reduce从sequence中依次取出元素，将其与上一次的function结果再次调用function。第一次调用时，可以提供initial参数，不提供则以sequence前两个元素调用function。
+	from functools import reduce,reduce(lambda x,y:x+y,["a","b","c"],"d")>>dabc
+	sort函数和sorted函数：a = random.sample(range(0,100,2),10),a.sort(reverse=True) # 注意！对a进行操作，返回值为None,因此b=a.sort(reverse = True)>>b == None
+		sorted(a) # 不对a进行操作，b = sorted(a,reverse =True)>>b即a排序后的结果。
+
+49 随机数
+	import random
+	random.random() # [0,1.0)内浮点数
+	random.uniform(a,b) # [a,b]内浮点数
+	random.randint(a,b) # [a,b]内整数
+	random.randrange(a,b,c) # 从[a,b)中按步长c筛选出一个可迭代序列，再从该序列中生成一个随机数，相当于random.choice(range(a,b,c))
+	random.choice(squence) # 从可迭代序列squence中生成一个随机数
+	random.shuffle(squence) # 将原可迭代序列打乱，返回None而不是新的可迭代序列
+	random.sample(squence,k) # 从可迭代序列中生成包含k个随机数的序列
+	生成多个随机数：
+	方法一：[random.randint(0,100) for i in range(10)]
+	方法二：[random.sample(range(0,100,2),1) for i in range(10)]
+	方法三：random.sample(range(0,100,2),10)
+
+50 集合
+	去重：a = {1,2,3,4,5,5,5},b = set(a)>>b == {1,2,3,4,5} # a,b都是set，但是通过给set函数传入一个序列可以去重。
+	交集：a = set("abcde"),b = set("cdefg"),a&b>>{"c","d","e"}
+	并集：a|b>>{"a","b","c","d","e","f","g"}
+	差集：a-b>>{"a","b"}
+	对称差集：a^b>>{"a","b","f","g"}
+	补集：(a|b)-a
+
+51 functools
+	import functools,dir(functools)
+	偏函数(省去传参的麻烦)：
+		def show(*args,**kwargs):
+			print(args)
+			print(kwargs)
+		p1 = functools.partial(show,1,2,3,name = "huashaojie")
+		p1()>>(1,2,3),{"name":"huashaojie"}
+		p1(4,age=20)>>(1,2,3,4),{"name":"huashaojie","age":20}
+	wraps函数：
+		def note(func):
+			"note function"
+			# 不加下面这一句，则print(help(test))打印出的__doc__是"wrapper function"而不是"test function"
+			@functools.wraps(func)
+			def wrapper():
+				"wrapper function"
+				return func()
+			return wrapper
+		@note
+		def test():
+			"test function"
+		print(test.__doc__)
+	
+52 python标准库
+	builtins、os、sys、functools、json、logging、multiprocessing、threading、copy、time、datetime、calendar、hashlib、random、re、socket、shutil、glob
+	查看：import os，dir(os)
+
+53 hashlib	
+	import hashlib,t = hashlib.md5(),t.update(b"huashaojiepassword"),t.hexdigest()# 返回32位16进制密码。
+
+54 常用扩展库
+	requests、urllib、scrapy、beautifulsoup4、celery、redis、Pillow、xlsxwrite、xlwt、xlrd、elasticsearch、pymysql、mongoengines、pymongo、matplotlib、numpy、scipy、django、tornado、flask、xmltodict、SimpleHTTPServer、gevent、fabric、pandas、scikit-learn
+
+55 pdb调试（函数当作一行命令直接执行返回）
+	python -m pdb test.py
+	命令：l(list显示所有代码)、n(next向下执行一行代码)、c(continue继续执行所有代码)、b 8(在第8行加断点，c执行到断点处停下)、b(查看所有断点)、clear 1(删除第一个断点)、在函数调用的行加断点，c执行到这一断点，s（step）进入函数，p a(打印参数a的值)，a(args打印所有参数值)、r(return执行到函数的最后一行)、q(退出pdb)
+	在程序里进行调试：
+		方法一：def func(*args,**kwargs):pass,import pdb,pdb.run("func(args)"),s进入函数调试。
+		方法二：import pdb,在断点前一行加上pdb.set_trace()。python test.py，执行到断点处停止，开始调试。
+
+56 pep8规则
+	函数与函数用一行隔开，类与函数用两行隔开，具有独立功能的代码块用一行隔开。
+	一行导入一个模块。顺序：标准库》第三方》自定义，不同类型之间用空行隔开。
+	逗号、分号、冒号前避免空格。
+	类用大驼峰，函数、变量用下划线。
+
+57 多任务
+	时间片轮转、优先级调度、并发（伪并行，任务数大于cpu核数）、并行（任务数小于cpu核数）
+
+58 进程
+	进程：运行中的程序，包括程序和运行环境。
+	fork()：unix/linux系统中独有，windows没有。
+	import os
+	import time 
+	ret = os.fork()
+	if ret==0:
+		while True:
+			print("---1---")
+			time.sleep(1)
+	else:
+		while True:
+			print("---2---")
+			time.sleep(1)
+
+	import os
+	ret = os.fork() # 父进程创建子进程，返回ret，ret即子进程id。
+	print(ret)
+	if ret>0: # 父进程返回的ret>0
+		print("父进程id：",os.getpid())
+	else: # 子进程创建的ret=0
+		print("子进程id：",os.getpid()) # 子进程id=ret
+		print("子进程的父进程id：",os.getppid()) 
+
+59 父子进程先后顺序
+	import os 
+	import time
+	
+	ret = os.fork()
+	
+	if ret == 0:
+		print("---子进程---")
+		time.sleep(5)
+		print("---子进程over---",end = "")
+	else:
+		print("---父进程---")
+		time.sleep(3)
+
+60 全局变量不共享
+	import os
+	import time
+	
+	ret = os.fort()
+	num = 100
+	
+	if ret == 0:
+		print("---子进程---")
+		print(num)
+		num += 100
+		print(num)
+	else:
+		time.sleep(3)
+		print("---父进程---")
+		print(num)
+	不同设备进程之间相互通信要借助网络。
+
+61 多个fork
+	import os
+	import time
+
+	ret = os.fork() # 产生父进程和子进程
+	
+	if ret == 0:
+		print("---1---")
+	else:
+		print("---2---")
+
+	ret = os.fork() # 父进程产生第二个子进程，子进程产生孙进程
+	
+	if ret == 0:
+		print("---11---")
+	else:
+		print("---22---")
+	# 共有四个进程
+	
+	import os
+	import time
+	
+	ret = os.fork()
+	ret = os.fork()
+	ret = os.fork()
+	
+	print("---子进程---")
+	# 共8个进程
+
+62 Process创建子进程
+	from multiprocessing import Process
+	import time
+	
+	def test():
+		while True:
+			print("---test---")
+			time.sleep(1)
+	def main():
+		p = Process(target=test)
+		p.start()
+	
+		while True:
+			print("---main---")
+			time.sleep(1)
+	if __name__ == "__main__":
+		main()
+
+64 join
+	from multiprocessing import Process
+	import time
+	
+	def test():
+		while True:
+			print("---test---")
+			time.sleep(1)
+	def main():
+		p = Process(target=test)
+		p.start()
+		p.join(timeout) # 让子进程结束后，父进程才继续执行。timeout表示超时时间，超过timeout父进程不待子进程结束执行。
+	
+		while True:
+			print("---main---")
+			time.sleep(1)
+	if __name__ == "__main__":
+		main()
+	
+	p.terminate() # 结束进程
+
+65 Process子类
+	from multiprocessing import Process
+	import time
+
+	class Process_class(Process):
+		
+		def run(self):
+			while True:
+				print("---run---")
+				time.sleep(1)
+	def main():
+		p = Process_class()
+		p.start()
+		p.join(3)
+
+		while True:
+			print("---父进程---")
+			time.sleep(1)
+	
+	if __name__ == "__main__":
+		main()
+
+66 进程池
+	# 进程池默认主进程不会等待子进程结束后才结束，可以用join改变
+	from multiprocessing import Pool
+	import time
+	import os
+
+	def test():
+		print("---子进程---%d" % os.getpid())
+		time.sleep(1)
+			
+	
+	
+	def main():	
+		po = Pool(3) # 进程池中最大进程数为3
+	
+		# 向进程池中添加10个任务，3个进程开始执行3个任务，执行完成再执行另3个任务，直到10个任务都被执行。
+		for i in range(10):
+			# po.apply(test) # 非异步（阻塞式），即必须等待前面的任务结束后，才能添加新任务。
+			po.apply_async(test) # apply_async（非阻塞式），异步添加任务，即一次性添加所有任务，不需等待前面的任务执行完成再添加。
+		
+		# 关闭进程池，不再接受任务
+		po.close()
+		# 让父进程等待子进程结束
+		po.join()
+	
+	if __name__ == "__main__":
+		main()
+	
+	
+65 多种多进程方式比较
+	弃用fork
+	主进程一般用来等待，真正的任务在子进程中定义。
+
+66 进程间通信（Queue/队列）
+	队列：先进先出
+	栈：先进后出
+	from multiprocessing import Queue
+	
+	q = Queue(3) # 3表示最多储存3个消息，也可不写，则无限储存
+	q.qsize()
+	q.put("message1")
+	q.put("message2")
+	q.put("message3")
+	tyr:
+		q.put_nowait("message4")
+	except Exception as e:
+		print(e)
+	q.full()
+	q.empty()
+	q.get()
+	q.get()
+	q.get()
+	q.empty()
+	try:
+		q.get_nowait()
+	except Exception as e:
+		print(e)
+	
+
+	from multiprocessing import Process
+	from multiprocessing import Queue
+	import os
+	import time
+	
+	def writer(q):
+		for value in ['a','b','c']:
+			q.put(value)
+			time.sleep(1)
+	
+	def reader(q):
+		while True:
+			if not q.empty():
+				value = q.get(True)
+				time.sleep(1)
+			else:
+				break
+
+	if __name__ == "__main__":
+		q = Queue(3)
+		pw = Process(target=write,(q,))
+		pr = Process(target=read,(q,))
+		
+		pw.start()
+		pw.join()
+		
+		
+		pr.start()
+		pr.join()
+		
+		print("---主进程结束---")
+
+	# 进程池不能用multiprocessin.Queue,而要用multiporcessin.Manager.Queue
+	from multiprocessing import Manager
+	from multiprocessing import Pool
+	import os
+	import time
+	
+	def writer(q):
+		for value in ['a','b','c']:
+			q.put(value)
+			time.sleep(1)
+
+	def reader(q):
+		for i in range(q.qsize()):
+			print("value is %s" % q.get(True))
+
+	if __name__ == "__main__":
+		q = Manager().Queue(3)
+		po = Pool(3)
+		po.apply(writer,(q,))
+		po.apply(reader,(q,)) # 使用apply，省去while True死循环
+	
+		po.close()
+		po.join()
+	
+		print("---主进程结束---")
+
+67 多进程拷贝文件
+	# 开发时，终端中开多个窗口，vim编写代码（w保存不退出），终端调试，ipython命令行调试。
+	import os 
+	from multiprocessing import Pool
+	from multiprocessing import Manager
+	import time
+
+	def copyFile(fileName,oldFolderName,newFolderName,queue):
+
+		"""copy file to new folder"""
+		
+		fr = open(oldFolderName+"/"+fileName,"r")
+		fw = open(newFolderName+"/"+fileName,"w")
+		
+		content = fr.read()
+		fw.write(content)
+		
+		fr.close()
+		fw.close()
+		
+		queue.put(fileName)
+		
+	def main():
+		
+		# get the old folder and make the new folder
+		oldFolderName = input("请输入原文件夹：")
+		newFolderName = oldFolderName+"副本"
+		os.mkdir(newFolderName)
+		
+		# get names of all files
+		fileNames = os.listdir(oldFolderName)
+		
+		# build a pool
+		pool = Pool(5)
+		
+		queue = Manager().Queue()
+		
+		t1 = time.time()
+		
+		# start the process
+		for fileName in fileNames:
+			pool.apply_async(copyFile,(fileName,oldFolderName,newFolderName,queue))
+		
+		num = 0
+		allNum = len(fileNames)
+		
+		while True:
+			queue.get()
+			num += 1
+			rate = num/allNum
+			print("当前进度：%.2f%%" % (rate*100))
+			
+			if num == allNum:
+				break
+			
+		t2 = time.time()
+		
+		print("Complete!")
+		print("time: ",t2-t1)
+
+	if __name__ == "__main__":
+		main()
+
+68 对比
+	# 多种多进程方式的对比
+	from multiprocessing import Pool
+	from multiprocessing import Process
+	import time
+
+	def son():
+
+		print("son process")
+		time.sleep(1)
+
+	class Process_son(Process):
+		
+		
+		def run(self):
+			
+			son()
+			
+	def main():
+		
+		t1 = time.time()
+		
+		for i in range(5):
+			son()
+			
+		t2 = time.time()
+		print("循环耗时：",t2-t1)
+		
+		t1 = time.time()
+		
+		pList = []
+		for i in range(5):
+			p = Process(target=son)
+			p.start()
+			pList.append(p)
+		
+		for p in pList:
+			p.join()
+			
+		t2 = time.time()
+		print("Process耗时：",t2-t1)
+		
+		t1 = time.time()
+		
+		p1 = Process_son(target=son)
+		p2 = Process_son(target=son)
+		p3 = Process_son(target=son)
+		p4 = Process_son(target=son)
+		p5 = Process_son(target=son)
+		
+		p1.start()
+		p2.start()
+		p3.start()
+		p4.start()
+		p5.start()
+		
+		p1.join()
+		p2.join()
+		p3.join()
+		p4.join()
+		p5.join()
+		
+		t2 = time.time()
+		print("Process子类耗时：",t2-t1)
+		
+		t1 = time.time()
+		
+		pool = Pool(5)
+		for i in range(5):
+			pool.apply_async(son)
+			
+		pool.close()
+		pool.join()
+		
+		t2 = time.time()
+		
+		print("Pool耗时：",t2-t1)
+
+	if __name__ == "__main__":
+		main()
+
+69 Thread多线程
+	进程内部的子任务即线程，因此一个进程至少有一个线程。
+	子线程是操作系统调用的最小单位
+	与进程不同，主线程要等待所有子进程结束才结束
+	因此多任务有3种实现方式：单线程多进程，单进程多线程，多进程多线程（很少用）
+	Windows下创建进程的开销很大，因此主要研究多个线程资源分配；linux下创建进程开销较小，因此主要研究进程间通讯。
+	python中的thread模块比较底层，threading模块封装比较好。
+	from multiprocessing import Process
+	from multiprocessing import Pool
+	from multiprocessing import Process
+	import threading
+	import time
+
+	# 创建子线程
+	def son():
+
+		print("son process")
+		time.sleep(1)
+		
+	def main():
+
+		for i in range(5):
+			t = threading.Thread(target=son)
+			t.start()
+		
+		for i in range(5):
+			p = Process(target=son)
+			p.start()
+			
+		pool = Pool(5)
+		for i in range(5):
+			pool.apply_async(son)
+		
+		pool.close()
+		pool.join()
+
+	if __name__ == "__main__":
+		main()
+	
+70 Thread子类
+	# 与Process子类类似
+	# 程序的封装性
+	import threading
+	import time
+
+	def son():
+		print("son thread")
+		time.sleep(1)
+		
+	class Thread_son(threading.Thread):
+
+		
+		def run(self):
+		
+			son()
+		
+	def main():
+		
+		for i in range(5):
+			t = Thread_son()
+			t.start()
+			
+	if __name__ == "__main__":
+		main()
+
+71 线程的执行顺序
+	不确定，由操作系统调度。
+
+72 线程共享全局变量
+	优点：不需要像进程那样通过队列、管道通讯
+	缺点：
+	from threading import Thread
+	import time
+
+	num = 0
+	def son1():
+		
+		global num
+		
+		for i in range(1000000):
+			num += 1
+		
+		print(num)
+	
+	def son2():
+		global num
+
+		for i in range(1000000):
+			num += 1
+		
+		print(num)
+	
+	t1 = Thread(target=son1)
+	t1.start()
+
+	time.sleep(3) # 注释掉这行代码即可看出线程缺点。num += 1分为两步：num+1,num = num+1,由于系统调度线程没有固定顺序，所有会出错。
+
+	t2 = Thread(target=son2)
+	t2.start()
+	
+	print(num)
+
+	# nums也共享
+	from threading import Thread
+	import time
+	
+	nums = [1,2,3]
+
+	def son1(nums):
+		nums.append(4)
+		print(nums)
+	
+	def son2(nums):
+		print(nums)
+	
+	t1 = Thread(target=son1)
+	t1.start()
+
+	time.sleep(3)
+
+	t2 = Thread(target=son2)
+	t2.start()
+
+73 解决执行1000000次的bug
+	from threading import Thread
+	import time
+
+	num = 0
+	flag = 1
+	def son1():
+		
+		global num
+		
+		if flag==1:
+			for i in range(1000000):
+				num += 1
+		
+		print(num)
+	
+	def son2():
+		global num
+		
+		# 轮询，效率不高。
+		while True:
+			if flag!=1:
+				for i in range(1000000):
+					num += 1
+				break
+		
+		print(num)
+	
+	t1 = Thread(target=son1)
+	t1.start()
+
+	t2 = Thread(target=son2)
+	t2.start()
+
+	print(num)
+
+77 互斥锁
+	from threading import Thread
+	from threading import Lock
+	import time
+
+	num = 0
+	flag = 1
+	lock = Lock()
+
+	def son1():
+		
+		global num
+		
+		for i in range(1000000):
+			lock.acquire()
+			num += 1
+			lock.release()
+		time.sleep(5)
+		
+		print(num)
+
+	def son2():
+		global num
+		
+		
+		for i in range(1000000):
+			lock.acquire()
+			num += 1
+			lock.release()
+		time.sleep(5)
+			
+				
+
+		print(num)
+
+	def main():
+		
+		time1 = time.time()
+		
+		t1 = Thread(target=son1)
+		t1.start()
+
+		t2 = Thread(target=son2)
+		t2.start()
+		
+		t2.join()
+		
+		time2 = time.time()
+		
+		print("整个程序耗时%.2f秒" % (time2-time1))
+
+	if __name__ == "__main__":
+		main()
+
+78 多线程使用非共享变量
+	# 非共享（非全局）变量在各线程内相互独立，不用加锁
+	from threading import Thread
+	import threading
+	import time
+
+	def son():
+		name = threading.current_thread().name
+		num = 100
+		
+		if name=="Thread-1":
+			num += 1
+		else:
+			time.sleep(2)
+		print("thread is %s" % threading.current_thread().name,num)
+	
+	t1 = Thread(target=son)
+	t1.start()
+
+	t2 = Thread(target=son)
+	t2.start()
+
+79 死锁
+	from threading import Lock
+	import threading
+
+	lock = Lock()
+	lock.acquire(blocking,timeout) 
+	避免死锁：
+	方法一：blocking默认为True，即上锁失败，程序停在此处；改为False，则程序继续向下执行
+	方法二：timeout设置最大时长，等待timeout后还不能上锁，则程序继续向下执行。
+
+80 同步
+	同步：协同步调，按预定次序执行。异步：执行次序不确定
+	# 用锁实现同步
+	from threading import Lock
+	from threading import Thread
+	import time
+
+	lock1 = Lock()
+	lock2 = Lock()
+	lock2.acquire()
+	lock3 = Lock()
+	lock3.acquire()
+
+	class son1(Thread):
+
+
+		def run(self):
+			
+			while True:
+				if lock1.acquire():
+					print("son1")
+					time.sleep(0.5)
+					lock2.release()
+			
+	class son2(Thread):
+
+
+		def run(self):
+			
+			while True:
+				if lock2.acquire():
+					print("son2")
+					time.sleep(0.5)
+					lock3.release()
+
+	class son3(Thread):
+
+
+		def run(self):
+			
+			while True:
+				if lock3.acquire():
+					print("son3")
+					time.sleep(0.5)
+					lock1.release()		
+
+	def main():
+		
+		t1 = son1()
+		t2 = son2()
+		t3 = son3()
+		
+		t1.start()
+		t2.start()
+		t3.start()
+		
+	if __name__ == "__main__":
+		main()
+
+81 生产者与消费者解耦合
+	耦合：各部分之间联系紧密且错综复杂
+	# 用队列（线程中的队列，用法与进程通讯的队列类似）解耦
+	# 用队列解决线程间或进程间执行速度冲突的问题
+	from threading import Thread
+	from queue import Queue
+	import time
+
+	queue = Queue()
+
+	class Producer(Thread):
+
+		
+		def run(self):
+		
+			count = 0
+			
+			while True:
+				if queue.qsize()<1000:
+					for i in range(100):
+						count += 1
+						product = "product"+str(count)
+						queue.put(product)
+						print("produce",product)
+				time.sleep(0.5)
+						
+	class Consumer(Thread):
+
+		def run(self):
+		
+			while True:
+				if queue.qsize()>100:
+					for i in range(3):
+						product = queue.get()
+						print("consume",product)
+					
+				time.sleep(1)
+				
+	def main():
+		
+		for i in range(500):
+			queue.put("raw product"+str(i))
+		
+		for i in range(2):
+			t1 = Producer()
+			t1.start()
+		
+		for i in range(5):
+			t2 = Consumer()
+			t2.start()
+		
+	if __name__ == "__main__":
+		main()
+
+82 threadlocal
+	# threadlocal创建一个对象，在不同进程内对该对象设置相同属性，该属性分属不同进程，互补影响。
+	import threading
+
+	local_school = threading.local()
+
+	def son1():
+		std = local_school.student
+		print(std,threading.current_thread().name)
+		
+	def son2(name):
+		local_school.student = name
+		son1()
+		
+	def main():
+			
+		t1 = threading.Thread(target=son2,args=("name1",),name="Thread-1")
+		t2 = threading.Thread(target=son2,args=("name2",),name="Thread-2")
+			
+		t1.start()
+		t2.start()
+			
+		t1.join()
+		t2.join()
+			
+	if __name__ == "__main__":
+		main()
+
+83 异步
+	异步：一个任务等待另一个任务执行完成的过程中，仍然执行自己的工作，而不仅仅是等待。同步即协调、按次序执行。
+	from multiprocessing import Pool
+	import time
+	import os
+
+	def son():
+		
+		print("---子进程---%d" % os.getpid())
+		print("---父进程---%d" % os.getppid())
+		
+		for i in range(3):
+			print("---%d---" % i)
+			time.sleep(1)
+		
+		return "子进程结束"
+		
+	def func(*args,**kwargs):
+
+		print("---当前进程---%d---" % os.getpid())
+		print(args,kwargs)
+		
+	def main():
+
+		pool = Pool(3)
+		pool.apply_async(func=son,callback=func) # 回调函数，即子进程通知父进程自己已经执行完成。
+
+		time.sleep(5)
+
+	if __name__ == "__main__":
+		main()
+
+84 GIL
+	gil：全局解释器锁
+	在python中多线程是伪多线程，多进程效率高于多线程。
+	想要实现真多线程，要用c语言重写。
+
+85 TCP/IP协议
+	不同类型的设备（计算机）之间相互通信（交换数据）的协议，总称为TCP/IP协议（族），不仅是两个。
+	层次（OSI模型）：
+		四层：链路层（网络接口层ARP,RAPP，硬件接口）》网络层（IP,ICMP,IGMP）》传输层（TCP,UDP）》应用层（应用进程）
+		七层：链路层（物理层、数据链路层）》网络层》传输层（TCP,UDP）》应用层（会话层、表示层、应用层）
+
+86 端口
+	端口即与进程对应的接口号，网络数据包含一个端口号，将数据发送给指定端口号的进程。0-65535
+	分类：
+		知名端口：0-1023，如：80（HTTP），21（FTP），22（ssh），固定分配
+		动态端口：1024-65535，动态分配，进程关闭，释放所占用的端口号。
+	查看端口：netstat -an
+
+87 ip地址
+	ip地址包括4个字：A,B,C包括两部分，网络地址，主机地址，网络地址不变，主机地址可变，网络地址相同的计算机属于同一个网。
+	分类：	
+		A类：一字节网络地址，3字节主机地址，网络地址最高位必须为0
+		B类：两字节网络地址，2字节主机地址，网络地址最高两位必须位10
+		C类：3字节网络地址，1字节主机地址，网络地址最高三位必须为110，192.168.137.xxx，xxx为主机地址，范围1-254.如果为0，整个ip只表示一个网络地址，如果为255，表示广播地址。
+		A,B,C类都属于ipv4，全球已经划分完。
+		D类：用于多点广播，第一个字节为1110
+		E类：未来使用，被ipv6取代。
+	私有ip：在局域网使用，不能被公网访问。
+		10.0.0.0-10.255.255.255
+		172.16.0.0-172.31.255.255
+		192.168.0.0-192.168.255.255
+	127.0.0.1用于回路测试，检测本机网络链接。
+
+88 socket（套接字）
+	本地进程相互通信有很多方式（队列等），socket用于实现网络（不同设备）间进程通信。
+	import socket
+	
+	# 创建tcp socket，tcp协议慢而稳定
+	st = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+	# 创建udp socket，udp协议快而不稳定，容易丢失数据
+	su = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
+	
+
+89 使用socket发送数据
+	from socket import *
+	
+	udpSocket = socket(AF_INET,SOCK_DGRAM)
+	udpSocket.sendto(b"hello",("192.168.30.128",8080))
+
+90 绑定端口
+	动态端口被占用，在释放之前其他进程不能占用。
+	from socket import *
+	
+	udpSocket = socket(AF_INET,SOCK_DGRAM)
+	# 绑定端口号7788，前一个参数表示本机ip，本机一个网卡一个ip，为空表示任何本机ip。接收方需要绑定。
+	udpSocket.bind(("",7788))
+	udpSocket.sendto(b"hello",("192.168.30.128",8080))
+
+	# 接受数据
+	from socket import *
+	
+	udpSocket = socket(AF_INET,SOCK_DGRAM)
+	udpSocket.bind(("",7788))
+	# 1024表示本次最大接受数据为1024个字节
+	recvData = udpSocket.recvfrom(1024) 
+	print(recvData)
+	
+	网络通信方式：单工（收音机/单向），半双工（对讲机/半双向），全双工（电话/双向）
+	socket：全双工，能同时收发。
+
+91 python编码
+	from socket import *
+
+	udpSocket = socket(AF_INET,SOCK_DGRAM)
+
+	destIP = input("请输入目标ip：")
+	destPort = int(input("请输入目标端口："))
+	destData = input("请输入目标数据：")
+
+	udpSocket.sendto(destData.encode("gb2312"),(destIP,destPort)) # utf-8更通用
+
+92 udp网络通信过程
+	发送方组包：原始数据》应用层（不同进程有）》传输层（TCP/UDP）》目的端口+原始数据》网络层》目的ip+目的端口+原始数据》链路层》mac地址+目的ip+目的端口+原始数据
+	接受方解包：mac地址+目的ip+目的端口+原始数据》链路层》目的ip+目的端口+原始数据》网络层》目的端口+原始数据》传输层》应用层》原始数据
+	mac地址：即网卡唯一标识。
+
+93 简单聊天室
+	from socket import *
+	import time
+
+	def main():
+	# 1. 创建socket 
+    	udpSocket = socket(AF_INET,SOCK_DGRAM)
+    	udpSocket.bind(("",7788))
+
+	# 2. 创建循环，socket不断接收数据并打印到屏幕上
+    	while True:
+        	recvData = udpSocket.recvfrom(1024)
+        	content,ipPort = recvData
+        	content = content.decode("gb2312")
+        	print("ip[%s]---port[%s]---content[%s]" % (ipPort[0],ipPort[1],content))
+        	time.sleep(1)
+
+	if __name__ == "__main__": 
+		main()
+
+94 udp应用：echo服务器
+	echo服务器：收到数据再传递回去。
+	from socket import *
+	import time
+
+	def main():
+	# 1. 创建socket 
+    	udpSocket = socket(AF_INET,SOCK_DGRAM)
+    	udpSocket.bind(("",7788))
+
+	# 2. 创建循环，socket不断接收数据并打印到屏幕上
+    	while True:
+        	recvData = udpSocket.recvfrom(1024)
+        	content,ipPort = recvData
+		udpSocket.sendto(content,ipPort)
+        	time.sleep(1)
+
+	if __name__ == "__main__": 
+		main()
+
+95 模拟qq聊天
+from socket import *
+import threading
+import time
+
+def main():
+
+# 1. 创建socket
+    udpSocket = socket(AF_INET,SOCK_DGRAM)
+    udpSocket.bind(("",7788))
+
+    destIP = input("请输入对方ip：")
+    destPort = input("请输入对方端口：")
+    destPort = int(destPort)
+
+# 2. 发送消息
+    def send():
+
+        while True:
+            sendData = input(">>")
+            sendData = sendData.encode("gb2312")
+            udpSocket.sendto(sendData,(destIP,destPort))
+            time.sleep(1)
+
+
+# 3. 接收消息
+    def receive():
+        
+        while True:
+            recvData = udpSocket.recvfrom(1024)
+            if recvData:
+                content = recvData[0]
+                content = content.decode("gb2312")
+                print(">>"+content)
+            time.sleep(1)
+
+    t1 = threading.Thread(target=send)
+    t2 = threading.Thread(target=receive)
+
+    t1.start()
+    t2.start()
+
+    t1.join()
+    t2.join()
+
+if __name__ == "__main__":
+    main()
+
+
+	python程序标准：
+	def func1():
+		pass
+
+	def func2():
+		pass
+	
+	def main():
+		pass
+		func1()
+		func2()
+
+	if __name__ == "__main__":
+		main()
+
+96 wireshark抓包
+	192.168.1.255，表示广播ip，该网段即192.168.1内所有ip都要接收。只要主机地址全为1，即255，就是广播地址。	
+	wireshark每一行代表一个数据包，单击该行，中间窗口是该数据包的详细信息，从下到上依次是，原数据》应用层》传输层》网络层》链路层
+	Filter可以过滤数据包：arp，tcp。。。，ip.dst == 192.168.30.128，ip.src == 192.168.30.129 and udp.port == 2425
+
+97 tftp下载过程分析
+	c/s：客户端/服务器架构
+	b/s：浏览器/服务器架构
+	tftp：简单文件传输协议
+	tftp端口：默认69
+	读写请求：操作码（1/2对应下载/上传，两字节） 文件名（n字节字符串） 0 模式（octet决定传输格式） 0
+	数据包：操作码（3,两字节对应data表示文件内容数据） 块编号（2字节） 数据（512字节）
+	ACK（回复确认）：操作码（4,2字节） 块编号（2字节）
+	ERROR：操作码（5,2字节） 差错码（2字节） 差错信息（n字节字符串） 0 
+	当客户端接收到的数据小于516个字节时，表示数据已发送完毕。
+
+98 pack和unpack使用
+	大端：先存高位，0x11，0x22，0x1122
+	小端：先存低位，0x22，0x11，0x2211
+	网络数据格式要用大端
+from socket import *
+import struct 
+
+def main():
+
+    sendData = struct.pack("!H8sb5sb",1,"test.jpg",0,"octet",0)
+    udpSocket.sendto(sendData,(destIP,destPort))
+    udpSocket.close()
+    result = struct.unpack("!H2s",sendData[:4])
+
+    print(result)
+if __name__ == "__main__":
+    main()
+
+99 udp广播
+	单播：一对一
+	多播：一对多
+	广播：一对所有
+	局域网内，想要对所有设备通讯，需要借助交换机等进行广播。将数据发送到同一网段如192.168.1内的所有设备。
+	import socket,sys
+	
+	dest = ("<broadcast>",7788)
+	
+	s = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
+	s.setsockopt(socket.SOL_SOCKET,socket.SO_BROADCAST,1)
+	
+	s.sendto("hi",dest)
+	print("等待回复。。。")
+
+100 tcp
+	tcp：传输控制协议
+	udp：用户数据包协议
+	udp通信模式：
+		udp客户端：socket()>sendto()>recvfrom()>close()
+		udp服务器：socket()>bind()>recvfrom()>sendto()
+	tcp通信模式：
+		tcp客户端：socket()>connect()>send()>recv()>close()
+		tcp服务器：socket()，主动套接字>bind()>listen()，将主动套接字变为被动套接字>accept()>recv()>send()
+
+from socket import *
+
+tcpSocket = socket(AF_INET,SOCK_STREAM)
+tcpSocket.bind(("",7788))
+
+
+tcpSocket.listen(5)
+clientSocket,clientAddr = tcpSocket.accept()
+
+recvData = clientSocket.recv(1024)
+
+print(recvData)
+
+clientSocket.close()
+tcpSocket.close()
+
+
+101 tcp客户端
+	# tcp链接成功后即可传输数据，不需传递ip和端口。
+	from socket import *
+	
+	tcpSocket = socket(AF_INET,SOCK_STREAM)
+	tcpSocket.connect(("192.168.30.129",8080))
+	tcpSocket.send("hello".encode("gb2312"))
+	recvData = tcpSocket.recv(1024)
+	print(recvData)
+	tcpSocket.close()
+
+102 tcp服务器的大体框架
+from socket import *
+
+tcpSocket = socket(AF_INET,SOCK_STREAM)
+tcpSocket.bind(("",7788))
+tcpSocket.listen(5)
+
+while True:
+    clientSocket,clientAddr = tcpSocket.accept()
+    while True:
+        recvData = clientSocket.recv(1024)
+        if len(recvData)>0:
+            print(recvData.decode("gb2312"))
+        else:
+            break
+
+	sendData = input("send:")
+	clientSocket.send(sendData)
+    cliendSocket.close()
+tcpSocket.close()
+
+# 后面用多进程或多线程，对每个新的客户端请求，在新的进程或线程里创建套接字进行处理。
+
+
+103 packet tracer
+	两台电脑组网
+	DHCP：自动获取ip，动态ip
+	网络掩码：区分ip类型，A类，255.0.0.0，B类，255.255.0.0，C类，255.255.225.0 网络掩码与ip进行按位与，得到网络号（网络段）如192.168.30.0
+	多台电脑组网：方法一：hub（集线器），所有数据以广播发送。方法二：交换器，可以向特定ip发送数据。
+					
+104 网络连接详解
+	win xp》网络连接》本地连接》支持》详细信息
+	实际地址（mac地址，媒体访问控制，在链路层）：网卡唯一标识，前3个字节表示厂商，后3个字节表示网卡。在Ubuntu中，ifconfig中的的硬件地址。
+	ping过程：先用arp协议向交换机发送数据包，包内标有目标ip地址，以获取目标mac地址；交换机向同一网络号内的所有设备发送该arp包，所有设备查看该arp数据包，对照自己的ip地址，匹配则将arp包标注自己mac地址返回给交换机，交换机将arp包返回给源设备，源设备向交换机用icmp协议发送数据包，交换机向目标设备发送该icmp包。完成ping过程。
+	综上：icmp协议用于ping发送数据包，arp协议用于广播获取目标mac地址。rarp根据mac地址找ip。
+	
+105 路由器
+	功能：连接逻辑上分开的不同网段（网络号/局域网）的设备。
+	两台设备间通过网线连接，多台设备间在同一网段（局域网）通过交换机连接，不同网段通过路由器连接。
+	路由器上有不同的网卡对应不同网段，对不同网段进行数据交换。
+
+106 路由器的配置
+	RIP，路由解释协议，路由器之间的通信协议
+	访问百度：先根据mac地址访问默认网关，再由网关根据mac地址访问路由器，路由器再访问路由器，。。。，路由器访问百度网关。
+
+107 网络通信过程总结
+	DHCP：为网段中设备分配ip
+	ACK：确认数据
+	ip：设备逻辑地址
+	mac：设备物理地址
+	netmask：与ip按位与确定网段
+	默认网关：目标ip不在同一网段，则转发数据到默认网关。
+	dns：将ip解析为域名的协议。两个服务器，一个是dns服务器，将域名解析为对应ip，另一个对应该ip的服务器。
+	服务器类型：http/https，DHCP,TFTP,DNS,。。。
+
+108 访问百度过程总结：
+	1 解析www.baidu.com域名对应的ip地址
+		1.1 客户端发送arp数据包获取默认网关mac地址
+		1.2 客户端发送icmp数据包给默认网关，默认网关通过路由器将数据包传给目的网关
+		1.3 目的网关把数据包传给dns服务器
+		1.4 dns服务器解析出www.baidu.com对应ip地址，返回给发出请求的客户端
+	2 客户端发送tcp数据包给www.baidu.com对应ip地址（3次握手，建立连接）
+	3 客户端发送http请求给百度服务器
+	4 百度服务器接收到请求，将所需数据原路返回给客户端
+	5 客户端浏览器对返回数据进行渲染。
+	6 浏览器关闭tcp连接（4次挥手）
+
+109 tcp三次握手、四次挥手
+	clientSocket.connect()和serverSocket.accept()之间相互发送接收数据三次。
+	客户端向服务器发送一个数据包，包含syn（序列号）》服务器向客户端返回数据包，包含syn和ack（确认数据）》客户端向服务器发送数据包，包含ack》三次握手完成。
+	tcp客户端或服务器接收到数据后，会返回一个ack确认。因此比udp更稳定。
+	客户端调用socket.close()，向服务器发送一个数据》服务返回一个ack确认信息》服务器socket.recv()得到的数据长度为0，服务器socket.close()，向客户端发送一个数据》客户端返回一个ack确认数据》4次挥手完成
+	三次握手建立连接，四次挥手断开连接。
+	tcp短连接：每次传输数据都要三次握手、四次挥手
+	tcp长连接：只需一次三次握手、四次挥手。
+
+110 tcp的十种状态
+	客户端：SYN_SENT>ESTABLISHED>FIN_WAIT1>FIN_WAIT2>TIME_WAIT>CLOSED
+	服务器：LISTEN>SYN_RECV>ESTABLISHED>CLOSE_WAIT1>LAST_ACK>CLOSED
+
+111 2MSL问题
+	TTL：ping中出现的ttl反映经过的路由器的个数，每经过一个值减1
+	2MSL：客户端tcp从TIME_WAIT状态到CLOSED状态的时间。客户端TIME_WAIT状态到服务器状态到CLOSED状态的时间为1MSL.
+
+112 listen的队列长度
+	linux自主决定，与所设参数无关。	
+	
+
+113 常见网络攻击
+	半连接式（拒绝服务式）攻击：网站服务器listen参数设置值为m，攻击者不断访问该服务器，造成socket队列被占用。正常用户无法访问。
+	dns攻击：
+		1 dns服务器劫持：如将www.baidu.com对应的ip改为其他ip。可以将用户导向钓鱼网站，引导用户输入账号密码，因此输入账号密码前先用假的实验一下。
+		2 查看域名对应的ip：nslookup baidu.com
+	arp攻击（中间人攻击）：黑客将A设备传给B的数据拦截，伪装成B，对B伪装成A。
+
+114 NAT
+	电话线》调制解调器》路由器（WAN/广域网，LAN/局域网）》设备
+	集成了许多功能的路由器即NAT，网络地址转换器。
+
+127 单进程非阻塞式服务器
+from socket import *
+
+tcpSocket = socket(AF_INET,SOCK_STREAM)
+tcpSocket.bind(("",7788))
+tcpSocket.setblocking(False)
+
+tcpSocket.listen()
+clientSocketList = []
+
+while True:
+    try:
+        clientSocket,clientAddr = tcpSocket.accept()
+    except:
+        pass
+    else:
+        print("新客户端[%s]" % str(clientAddr))
+        clientSocket.setblocking(False)
+        clientSocketList.append(clientSocket)
+    
+    for clientSocket in clientSocketList:
+        try:
+            recvData = clientSocket.recv(1024)
+        except:
+            pass
+        else:
+            if len(recvData)>0:
+                print(recvData)
+            else:
+                clientSocket.close()
+                clientSocketList.remove(clientSocket)
+                print("客户端已经下线")
+
+128 select版服务器
+	多路复用：在不用多线程、多进程的条件下实现并发服务器。
+import select 
+import socket 
+import sys
+
+def main():
+    
+    serverSocket = socket.socket(AF_INET,SOCK_STREAM)
+    serverAddr = (("",7788))
+    serverSocket.bind(serverAddr)
+
+    serverSocketList = [serverSocket,sys.stdin]
+    running = True
+
+    while True:
+        recvSocketList,sendSocketList,exceptionSocketList = select.select(serverSocketList,[],[])
+
+        for socket in recvSocketList:
+            if socket == serverSocket:
+                clientSocket,clientAddr = serverSocket.accept()
+                serverSocketList.append(clientSocket)
+            else:
+                recvData = socket.recv(1024)
+                if recvData:
+                    socket.send(recvData)
+                else:
+                    serverSocketList.remove(socket)
+                    socket.close()
+
+129 epoll版服务器
+	select：有数量限制（32位1024，64位2048），用轮询的方式检测，效率低
+	poll：解决select中socket有数量限制（32位1024，64位2048）的问题，用轮询的方式检测，效率低
+	epoll：解决select中socket有数量限制（32位1024，64位2048）的问题，用事件通知的方式检测，效率高。
+	文件描述符：sys.stdin.fileno(),sys.stdout.fileno(),sys.stderror.fileno(),对象的fileno()函数返回文件描述符。
+import socket
+import select 
+
+serverSocket = socket.socket(AF_INET,SOCK_STREAM)
+serverSocket.bind(("",7788))
+sesverSocket.listen()
+
+epoll = select.epoll()
+
+epoll.register(serverSocket.fileno(),select.EPOLLIN | select.EPOLLET)
+connections = {}
+addresses = {}
+
+while True:
+    epoll_list = epoll.poll()
+    for fd,events in epoll_list:
+        if fd == serverSocket.fileno()
+            conn,addr = serverSocket.accept()
+            print("---新客户端---[%s]" % str(addr))
+            connectioins[conn.fileno()] = conn
+            addresses[conn.fileno()] = addr
+            epoll.register(conn.fileno(),select.EPOLLIN | select.EPOLLET)
+        elif events == select.EPOLLIN:
+            recvData = connections[fd].recv(1024)
+            if len(recvData)>0:
+                print(recvData)
+            else:
+                epoll.unregister(fd)
+                connections[fd].close()
+                print("%s---offline---" % str(addresses[fd]))
+
+130 用生成器协程
+	更具cpu上下文相互切换的比线程更小的执行单元。（实质是在进程中不断切换函数执行）
+	计算密集型：计算量大，cpu负荷高，用多进程
+	io密集型：数据读写（时间）消耗大，如网络程序，用多线程或协程
+	与多线程与多进程相比，协程是由开发者决定执行，二前两者是由操作系统决定切换。
+import time
+
+def func1():
+    
+    while True:
+        print("---func1---")
+        yield None
+        time.sleep(0.5)
+
+#def func2():
+#    
+#    while True:
+#        print("---func2---")
+#        yield None
+#        time.sleep(0.5)
+#
+#def main():
+#
+#    g1 = func1()
+#    g2 = func2()
+#
+#    while True:
+#        next(g1)
+#        next(g2)
+
+def func2(g):
+    
+    while True:
+        print("---func2---")
+        next(g)
+        time.sleep(0.5)
+
+def main():
+    g1 = func1()
+    func2(g1)
+
+if __name__ == "__main__":
+    main()
+
+131 用greenlet实现协程
+	sudo pip3 install greenlet
+from greenlet import greenlet
+import time
+
+def func1():
+    
+    while True:
+        print("---func1---")
+        gr2.switch()
+        time.sleep(0.5)
+
+def func2():
+
+    while True:
+        print("---func2---")
+        gr1.switch()
+        time.sleep(0.5)
+
+gr1 = greenlet(func1)
+gr2 = greenlet(func2)
+
+gr1.switch()
+
+132 gevent实现协程（比greenlet更强大）
+# gevent遇到一个比较耗时的操作，会自动切换。如网络中的数据请求（io密集型）
+import gevent
+import time
+
+def func(n):
+
+    for i in range(n):
+        print(gevent.getcurrent(),i)
+	# 模拟一个耗时操作，不能用time.sleep()
+        gevent.sleep(1)
+
+def main():
+    
+    g1 = gevent.spawn(func,5)
+    g2 = gevent.spawn(func,5)
+    g3 = gevent.spawn(func,5)
+
+    g1.join()
+    g2.join()
+    g3.join()
+
+if __name__ == "__main__":
+    main()
+
+133 gevent版服务器
+import sys
+import time
+import gevent
+from gevent import socket,monkey
+
+monkey.patch_all()
+
+def handle_request(conn):
+    
+    while True:
+        data = conn.recv(1024)
+        if not data:
+            conn.close()
+            break
+        print(data)
+        conn.send(data)
+
+def server(port):
+    s = socket.socket()
+    s.bind(("",port))
+    s.listen(5)
+    while True:
+        cli,addr = s.accept()
+        gevent.spawn(handle_request,cli)
+
+def main():
+    
+    port = 7788
+    server(port)
+    
+if __name__ == "__main__":
+    main()
+
+133 网络通信详解
+	网络层级：应用层》传输层》网络层》链路层
+	socket：操作系统提供的网络通信的接口
+	应用层：不同数据类型（应用场景）传输协议，如网页（http）、文件（ftp）、ssh、邮件（smtp）、qq的协议等等。
+	传输层：传输方式协议，如tcp、udp
+	网络层：逻辑地址协议（ip）
+	链路层：物理地址协议
+
+134 f12开发者工具
+	elements：网页内容
+	console：js交互工具
+	sources：页面资源
+	network：页面网络，headers中即http报文，包括起始行和协议头文件（header）。
+
+135 http请求方式
+	get：获取数据（查）
+	post：修改数据（改）
+	put：保存数据（增）
+	delete：删除数据（删）
+	options：询问服务器支持特性
+	head：返回报文头
+	
+136 
+	客户端（浏览器）先调用操作系统socket通过tcp协议与服务器建立联系，然后用http发送请求，服务器向客户端传输数据。服务器开发即在send和recv之间写代码。
+	request hearder：
+		起始行：状态码（status code） 200 ok，404 not found，2开头代表成功，3开头代表请求内容在别处、需跳转，4开头代表客户端错误，5开头代表服务器端错误。
+	一些http常用数据在header中，实际http网页内容数据在response中。
+	http应用不局限于浏览器，还包括web应用、app等。
+
+137 静态web服务器
+	大写变量就是常量（一个值），为了便于理解用含有特定意义的常量表示。
+#!/usr/bin/python
+
+import socket
+import re
+from multiprocessing import Process
+from multiprocessing import Pool
+
+# 设置静态文件根目录
+HTML_ROOT_DIR = "./html"
+
+
+def handle_request(client_socket):
+
+    """响应客户端请求"""
+    # 获取客户端请求
+    request_data = client_socket.recv(1024)
+    request_lines = request_data.splitlines()
+    for line in request_lines:
+        print(line)
+
+    # 解析报文起始行，获取请求路径
+    request_start_line = request_lines[0].decode("utf-8")
+    request_path = re.match(r"\w+ +(/[^ ]*) ", request_start_line).group(1)
+    if "/" == request_path:
+        request_path = "/index.html"
+    file_path = HTML_ROOT_DIR+request_path
+
+    # 构造响应数据
+    try:
+        f = open(file_path, 'rb')
+    except IOError:
+        response_start_line = "HTTP/1.1 404 Not Found\r\n"
+        response_headers = "Server: My server\r\n"
+        response_body = "not found"
+    else:
+        file_content = f.read()
+        f.close()
+        response_start_line = "HTTP/1.1 200 OK\r\n"
+        response_headers = "Server: My server\r\n"
+        response_body = file_content.decode("utf-8")
+
+    # 返回响应数据
+    response = response_start_line + response_headers + "\r\n" + response_body
+    print(response)
+    client_socket.send(bytes(response,"utf-8"))
+
+    # 关闭客户端连接
+    client_socket.close()
+
+
+def main():
+
+    # build a socket
+    server_socket = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+    server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    server_socket.bind(("", 8000))
+    server_socket.listen(128)
+
+    while True:
+        client_socket, client_address = server_socket.accept()
+        print("[%s,%s]已经连接" % client_address)
+        handle_client_process = Process(target=handle_request, args=(client_socket, ))
+        handle_client_process.start()
+        client_socket.close()
+
+
+if __name__ == "__main__":
+    main()
+
+138 python交互模式下清屏
+	import os
+	os.system("clear")# windows 下是cls
+
+139 以二进制读写和文本读写的区别
+	主要在于换行符：linux/unix/mac下换行符为\n，windows下为\r\n
+	以二进制写入windows会自动将\n转换为\r\n
+
+140 类和对象都有__dict__方法，保存类和对象的属性
+    类有__str__方法，用于将对象显示成字符串形式
+    类有__getattr__方法，用于获取对象属性
+    class Foo(object):
+        
+        def __init__(self, name):
+            
+            self.name = name
+
+        def __str__(self):
+            
+            return self.name
+
+        def __getattr__(self, item):
+
+            return self.item
+
+141 在字符串前加上r代表原始字符串，不转义。
+    s = "\\\nabc"
+    s = r"\\nabc"
+    正则表达式中：
+    \b匹配单词边界，\B匹配非单词边界:
+        s = "hello my friend"
+        pattern = r"^\w+\s\bmy\s\b\w+"
+    .表示除\n以外任一字符。
+    \w表示英文字符：a-z,A-Z,_
+    
+    匹配0-100：
+        pattern1 = r"^\w+\s\bmy\s\b\w+"
+        pattern2 = r"[1-9]?\d?$|100"
+
+    result = re.match(pattern, s)
+    result.group() # 表示匹配到的所有字符串
+    result.group(0) # 与result.group()效果相同
+    result.group(1) # 表示匹配到的第一个分组字符串
+
+    正则分组:
+    s = "<html><h1>hello</h1></html>"
+    pattern = r"<(.+)><(.+).+</\2></\1>" # 用\组号表示前面的分组
+    result = re.match(pattern, s)
+    result.groups() # 表示匹配到的所有分组
+
+    s = "<html><h1>hello</h1></html>"
+    pattern = r"<(?P<key1>.+)><(?P<key2>.+)>.+</(?P=key2)></(?P=key1)>"
+    result = re.match(pattern, s)
+
+    match, search, findall
+    match:从字符串首个字符开始匹配，匹配到pattern则返回，^没用
+    search:从整个字符串搜索pattern，搜索到就返回，只返回第一个
+    findall:搜索整个字符串，返回所有匹配到的。
+
+    sub:将匹配到的所有字符串替换
+    s = "php php php"
+    pattern = r"(p\w+\b)"
+    re.sub(pattern, "python", s)
+
+    re.sub(pattern, lambda x:x.group(1) + " is the worst", s)
+    def replace(result):
+        
+        return result.group() + " is the worst"
+
+    split:分割字符串
+    re.split(":| ", s)
+    贪婪与非贪婪
+    在*,+等数量描述符后加上?即可将贪婪变为非贪婪
+    re.match(r"(.+?)(\d+-\d+)", abc 123-123)
+    re.match(r"(http.+?.jpg), s)
+
+142 virtualenv
+    安装：sudo apt-get install virtualenv
+    创建：
+        mkdir virtualenvs
+        cd virtualenvs
+        virtualenv -p /usr/bin/python3.5 v1
+    激活：
+        source v1/bin/activate
+    退出：
+        deactivate
+    pycharm中：
+        file>settings>intepretor>create virtualenv
+        选择创建的virtualenv v1
